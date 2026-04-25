@@ -1,6 +1,9 @@
 #!/bin/bash
 set -ex
 
+# Git 보안 경고 해결 (Dubious Ownership 문제 해결)
+git config --global --add safe.directory "*"
+
 echo "--- System Info ---"
 pwd
 ls -la
