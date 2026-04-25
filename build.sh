@@ -1,7 +1,7 @@
 #!/bin/bash
 set -ex
 
-# Git 보안 경고 해결 (Dubious Ownership 문제 해결)
+# Git 보안 경고 해결 (모든 경로 허용)
 git config --global --add safe.directory "*"
 
 echo "--- System Info ---"
@@ -17,8 +17,13 @@ if [ ! -d "flutter" ]; then
   rm flutter.tar.xz
 fi
 
+# 추출 후 한 번 더 설정 (혹시 모를 상황 대비)
+git config --global --add safe.directory "$(pwd)/flutter"
+git config --global --add safe.directory "$(pwd)"
+
 export PATH="$PATH:$(pwd)/flutter/bin"
 flutter config --no-analytics
+flutter doctor -v
 
 # 2. 의존성 설치 및 빌드
 cd frontend
