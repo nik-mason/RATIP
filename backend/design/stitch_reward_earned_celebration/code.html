@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<link href="https://fonts.googleapis.com/css2?family=Epilogue:wght@700;800&amp;family=Be+Vietnam+Pro:wght@400;500;700&amp;family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          "colors": {
+            "secondary": "#855300",
+            "surface-container-lowest": "#ffffff",
+            "inverse-primary": "#c3c0ff",
+            "secondary-container": "#fea619",
+            "on-secondary-container": "#684000",
+            "on-tertiary-fixed-variant": "#8c0053",
+            "on-background": "#111c2d",
+            "secondary-fixed": "#ffddb8",
+            "on-tertiary-fixed": "#3e0022",
+            "surface-variant": "#d8e3fb",
+            "tertiary-fixed": "#ffd9e4",
+            "surface-container-low": "#f0f3ff",
+            "outline-variant": "#c8c4d5",
+            "secondary-fixed-dim": "#ffb95f",
+            "surface-container-highest": "#d8e3fb",
+            "on-primary-fixed-variant": "#3b35a7",
+            "on-primary-fixed": "#0f0069",
+            "error-container": "#ffdad6",
+            "surface": "#f9f9ff",
+            "on-secondary-fixed-variant": "#653e00",
+            "outline": "#777584",
+            "primary-fixed-dim": "#c3c0ff",
+            "surface-bright": "#f9f9ff",
+            "inverse-surface": "#263143",
+            "on-surface-variant": "#464553",
+            "on-tertiary-container": "#ff8abb",
+            "surface-tint": "#544fc0",
+            "primary-fixed": "#e2dfff",
+            "on-secondary": "#ffffff",
+            "tertiary-container": "#85004e",
+            "tertiary": "#5d0035",
+            "on-error": "#ffffff",
+            "surface-container": "#e7eeff",
+            "error": "#ba1a1a",
+            "tertiary-fixed-dim": "#ffb0cd",
+            "background": "#f9f9ff",
+            "on-tertiary": "#ffffff",
+            "on-primary": "#ffffff",
+            "on-secondary-fixed": "#2a1700",
+            "primary": "#1f108e",
+            "on-primary-container": "#a9a7ff",
+            "surface-container-high": "#dee8ff",
+            "on-error-container": "#93000a",
+            "primary-container": "#3730a3",
+            "inverse-on-surface": "#ecf1ff",
+            "on-surface": "#111c2d",
+            "surface-dim": "#cfdaf2"
+          },
+          "borderRadius": {
+            "DEFAULT": "0.25rem",
+            "lg": "0.5rem",
+            "xl": "0.75rem",
+            "full": "9999px"
+          },
+          "spacing": {
+            "gutter": "16px",
+            "stack-lg": "32px",
+            "stack-md": "16px",
+            "stack-sm": "8px",
+            "container-padding": "24px",
+            "margin-mobile": "20px",
+            "unit": "4px"
+          },
+          "fontFamily": {
+            "body-lg": ["Be Vietnam Pro"],
+            "label-bold": ["Be Vietnam Pro"],
+            "headline-xl": ["Epilogue"],
+            "headline-lg": ["Epilogue"],
+            "label-sm": ["Be Vietnam Pro"],
+            "headline-md": ["Epilogue"],
+            "body-md": ["Be Vietnam Pro"]
+          },
+          "fontSize": {
+            "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+            "label-bold": ["14px", {"lineHeight": "20px", "fontWeight": "700"}],
+            "headline-xl": ["40px", {"lineHeight": "48px", "letterSpacing": "-0.02em", "fontWeight": "800"}],
+            "headline-lg": ["30px", {"lineHeight": "38px", "letterSpacing": "-0.01em", "fontWeight": "700"}],
+            "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+            "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "700"}],
+            "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}]
+          }
+        },
+      },
+    }
+  </script>
+<style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+    }
+    .level-2-shadow {
+      shadow: 0 4px 20px rgba(55, 48, 163, 0.15);
+    }
+    .confetti-dot {
+      position: absolute;
+      width: 12px;
+      height: 12px;
+      border-radius: 4px;
+    }
+  </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body-md overflow-hidden">
+<!-- Background Layer with Static Confetti -->
+<div class="fixed inset-0 z-0 bg-primary/10 overflow-hidden">
+<!-- Manual confetti elements for visual energy -->
+<div class="confetti-dot bg-secondary-container opacity-60" style="top: 15%; left: 10%; transform: rotate(15deg);"></div>
+<div class="confetti-dot bg-tertiary-container opacity-60" style="top: 25%; left: 85%; transform: rotate(-20deg);"></div>
+<div class="confetti-dot bg-primary-container opacity-60" style="top: 70%; left: 15%; transform: rotate(45deg);"></div>
+<div class="confetti-dot bg-secondary-container opacity-60" style="top: 80%; left: 80%; transform: rotate(10deg);"></div>
+<div class="confetti-dot bg-tertiary-container opacity-40" style="top: 40%; left: 5%; transform: rotate(-15deg); width: 8px; height: 16px;"></div>
+<div class="confetti-dot bg-primary-container opacity-40" style="top: 10%; left: 90%; transform: rotate(30deg); width: 20px; height: 8px;"></div>
+<div class="absolute inset-0 bg-gradient-to-b from-transparent via-white/50 to-transparent"></div>
+</div>
+<!-- Modal Overlay -->
+<main class="relative z-10 flex min-h-screen items-center justify-center p-margin-mobile">
+<!-- The Floating Celebration Card -->
+<div class="relative w-full max-w-sm bg-surface-container-lowest rounded-[32px] p-10 flex flex-col items-center text-center shadow-[0_20px_40px_rgba(55,48,163,0.25)] border border-white/40 backdrop-blur-sm">
+<!-- Top Icon Decor -->
+<div class="absolute -top-8 bg-secondary-container p-3 rounded-full shadow-lg border-4 border-white">
+<span class="material-symbols-outlined text-white text-3xl" data-icon="celebration" style="font-variation-settings: 'FILL' 1;">celebration</span>
+</div>
+<header class="mb-stack-lg mt-stack-sm">
+<h1 class="font-headline-lg text-headline-lg text-primary tracking-tight">Reward Earned</h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-2">You've reached a new milestone!</p>
+</header>
+<!-- Central Trophy Section -->
+<div class="relative w-48 h-48 mb-stack-lg flex items-center justify-center">
+<!-- Glow Effect -->
+<div class="absolute inset-0 bg-secondary-container/20 rounded-full blur-3xl"></div>
+<!-- Trophy Container -->
+<div class="relative bg-gradient-to-br from-secondary-container to-secondary p-8 rounded-full shadow-[0_15px_30px_rgba(254,166,25,0.4)] border-4 border-white/20 active:scale-105 transition-transform duration-300 cursor-pointer">
+<span class="material-symbols-outlined text-white text-[80px]" data-icon="military_tech" style="font-variation-settings: 'FILL' 1;">military_tech</span>
+</div>
+</div>
+<!-- Reward Text -->
+<div class="mb-stack-lg">
+<div class="font-headline-xl text-headline-xl text-primary-container flex items-center justify-center gap-1">
+<span>+50</span>
+<span class="text-secondary-container">G</span>
+</div>
+<div class="inline-flex bg-primary-fixed text-on-primary-fixed-variant px-4 py-1 rounded-full font-label-bold text-label-sm mt-3 shadow-sm uppercase tracking-wider">
+          Gold Multiplier
+        </div>
+</div>
+<!-- Action Footer -->
+<footer class="w-full flex flex-col gap-3">
+<button class="w-full py-4 px-8 bg-gradient-to-b from-primary-container to-primary text-on-primary rounded-2xl font-headline-md text-headline-md shadow-[0_10px_20px_rgba(31,16,142,0.3)] hover:scale-[1.02] active:scale-95 transition-all duration-200">
+          Claim Reward
+        </button>
+<button class="w-full py-3 px-8 text-on-surface-variant font-label-bold text-label-bold hover:bg-surface-container-low rounded-xl transition-colors">
+          View All Tasks
+        </button>
+</footer>
+<!-- Floating Chips for extra detail -->
+<div class="absolute -right-4 top-1/3 bg-white shadow-lg p-2 rounded-2xl border border-indigo-50 transform rotate-12">
+<span class="material-symbols-outlined text-primary text-xl" data-icon="auto_awesome">auto_awesome</span>
+</div>
+<div class="absolute -left-2 bottom-1/4 bg-white shadow-lg p-2 rounded-2xl border border-indigo-50 transform -rotate-12">
+<span class="material-symbols-outlined text-secondary-container text-xl" data-icon="trending_up">trending_up</span>
+</div>
+</div>
+</main>
+<!-- Shell UI components suppressed for focused journey -->
+</body></html>

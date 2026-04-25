@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>System Status - Error</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "surface": "#fff8f7",
+                        "tertiary-container": "#00b177",
+                        "on-tertiary": "#ffffff",
+                        "inverse-on-surface": "#f7efee",
+                        "outline-variant": "#debfbe",
+                        "on-primary": "#ffffff",
+                        "surface-container": "#f4ecec",
+                        "on-secondary": "#ffffff",
+                        "surface-container-high": "#eee6e6",
+                        "secondary-fixed-dim": "#cfc4c4",
+                        "background": "#fff8f7",
+                        "on-secondary-fixed-variant": "#4c4545",
+                        "primary": "#a83639",
+                        "primary-container": "#f87171",
+                        "surface-variant": "#e8e1e0",
+                        "tertiary": "#006c47",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary": "#645c5d",
+                        "on-secondary-fixed": "#201a1b",
+                        "tertiary-fixed": "#72fbba",
+                        "surface-tint": "#a83639",
+                        "on-primary-fixed": "#410006",
+                        "secondary-container": "#e8dddd",
+                        "outline": "#8b7170",
+                        "on-tertiary-fixed": "#002113",
+                        "on-background": "#1e1b1b",
+                        "on-error": "#ffffff",
+                        "on-error-container": "#93000a",
+                        "primary-fixed-dim": "#ffb3b0",
+                        "on-surface-variant": "#574140",
+                        "surface-container-highest": "#e8e1e0",
+                        "error-container": "#ffdad6",
+                        "on-secondary-container": "#696161",
+                        "error": "#ba1a1a",
+                        "surface-dim": "#e0d8d8",
+                        "on-primary-container": "#6c0513",
+                        "tertiary-fixed-dim": "#52dea0",
+                        "on-tertiary-fixed-variant": "#005235",
+                        "on-surface": "#1e1b1b",
+                        "surface-container-low": "#faf2f1",
+                        "secondary-fixed": "#ebe0e0",
+                        "primary-fixed": "#ffdad8",
+                        "on-tertiary-container": "#003b25",
+                        "surface-bright": "#fff8f7",
+                        "inverse-surface": "#33302f",
+                        "inverse-primary": "#ffb3b0",
+                        "on-primary-fixed-variant": "#881d24"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "body-md": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "body-lg": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "label-sm": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "body-md": ["16px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}],
+                        "headline-md": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "body-lg": ["18px", {"lineHeight": "1.6", "letterSpacing": "0", "fontWeight": "400"}],
+                        "headline-lg": ["40px", {"lineHeight": "1.2", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "label-sm": ["13px", {"lineHeight": "1", "letterSpacing": "0.05em", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-card {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.8) 0%, rgba(248, 113, 113, 0.1) 100%);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            position: relative;
+        }
+        .glass-card::after {
+            content: '';
+            position: absolute;
+            inset: -1px;
+            border: 1px solid rgba(248, 113, 113, 0.2);
+            border-radius: inherit;
+            pointer-events: none;
+        }
+        .pulse-glow {
+            box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.4);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(248, 113, 113, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(248, 113, 113, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(248, 113, 113, 0); }
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body-md min-h-screen overflow-hidden flex flex-col">
+<!-- TopAppBar -->
+<header class="bg-white/70 backdrop-blur-[20px] flex justify-between items-center w-full px-4 h-16 sticky top-0 z-50 border-b border-white/40 shadow-[0_20px_40px_rgba(248,113,113,0.05)]">
+<div class="flex items-center gap-4">
+<button class="active:scale-95 transition-transform duration-200 text-red-400">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="font-['Plus_Jakarta_Sans'] font-bold tracking-tight text-zinc-900 text-lg">System Status</h1>
+</div>
+<div class="w-8 h-8 rounded-full bg-primary-container flex items-center justify-center text-on-primary-container font-bold text-xs">
+            JD
+        </div>
+</header>
+<!-- Map Background Canvas -->
+<main class="flex-grow relative w-full h-full">
+<!-- Map View (Blurred) -->
+<div class="absolute inset-0 z-0 blur-sm brightness-95">
+<img class="w-full h-full object-cover" data-alt="Modern satellite map view of a clean urban street layout with soft white and gray tones and subtle red location pins" data-location="San Francisco" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCmkkzGku3zAnAty8-0grw90TJV0d8RGG5wTqmXAeGLNB7avjvY79yG0zRRP9z_apB7Qa3QhmMvFQN_Wkq5P62iIezmAVTDF3uDZdcZbmnlpDPoRZ0rqx9ybNOsa8gXOXCJqRICIRH-t64P19SPG0aaQYLzgtnPG-xfuh3LBMT0Pn57i34SiLx79oy30kBp_H2sOIJ-WsVkP1GOEo9s240fjDEUC-HITHXzmp6ZoclmT_v6HL3RfjGKQDSmg4LjkHBHAs2CsfKBn2I"/>
+</div>
+<!-- Overlay for focus -->
+<div class="absolute inset-0 z-10 bg-zinc-900/10"></div>
+<!-- Error Popup Content -->
+<div class="absolute inset-0 z-20 flex items-center justify-center p-6">
+<div class="glass-card w-full max-w-sm rounded-[2rem] p-8 flex flex-col items-center text-center shadow-[0_20px_40px_rgba(248,113,113,0.1)]">
+<!-- Soft Red Warning Icon with Pulse -->
+<div class="w-20 h-20 rounded-full bg-primary-container/20 flex items-center justify-center mb-6 pulse-glow">
+<span class="material-symbols-outlined text-primary text-5xl" data-icon="distance" style="font-variation-settings: 'FILL' 1;">distance</span>
+</div>
+<!-- Text Content -->
+<h2 class="font-headline-md text-headline-md text-zinc-900 mb-2">Distance Too Far</h2>
+<p class="font-body-md text-body-md text-secondary mb-8">
+                    The requested location is outside the authorized perimeter. Please move closer to the target zone to proceed.
+                </p>
+<!-- Action Button -->
+<button class="w-full py-4 px-6 bg-primary-container text-white font-bold rounded-2xl active:scale-95 transition-all duration-200 shadow-[0_10px_20px_rgba(248,113,113,0.3)]">
+                    Try Again
+                </button>
+<!-- Secondary Action -->
+<button class="mt-4 text-primary font-semibold font-label-sm uppercase tracking-widest active:opacity-60 transition-opacity">
+                    View Boundary Map
+                </button>
+</div>
+</div>
+<!-- Float Indicator for Live Status -->
+<div class="absolute top-4 right-4 z-30">
+<div class="bg-white/80 backdrop-blur-md px-3 py-1.5 rounded-full flex items-center gap-2 border border-white/40 shadow-sm">
+<span class="w-2 h-2 rounded-full bg-red-500 pulse-glow"></span>
+<span class="font-label-sm text-zinc-600 uppercase">Signal: Low</span>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Filtered view: suppressed for focused journey, but logic dictates UI if navigation were present) -->
+<!-- The prompt implies a task-focused screen (Error), but per "Shell Visibility & Relevance" we keep standard nav for context of the 'top-level' app if required by JSON. However, as it's an error popup over a map, we'll implement it as per the global shell commands for consistency. -->
+<nav class="bg-white/60 backdrop-blur-[20px] fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-6 pb-8 pt-4 rounded-t-3xl border-t border-white/40 shadow-[0_-10px_30px_rgba(248,113,113,0.1)]">
+<a class="flex flex-col items-center justify-center text-zinc-400 hover:text-red-400 transition-all duration-200 active:scale-90" href="#">
+<span class="material-symbols-outlined" data-icon="home">home</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[10px] font-semibold uppercase tracking-widest">Home</span>
+</a>
+<a class="flex flex-col items-center justify-center text-red-500 drop-shadow-[0_0_8px_rgba(248,113,113,0.4)] active:scale-90 transition-all duration-200" href="#">
+<span class="material-symbols-outlined" data-icon="distance" style="font-variation-settings: 'FILL' 1;">distance</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[10px] font-semibold uppercase tracking-widest">Map</span>
+</a>
+<a class="flex flex-col items-center justify-center text-zinc-400 hover:text-red-400 transition-all duration-200 active:scale-90" href="#">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[10px] font-semibold uppercase tracking-widest">Alerts</span>
+</a>
+<a class="flex flex-col items-center justify-center text-zinc-400 hover:text-red-400 transition-all duration-200 active:scale-90" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-['Plus_Jakarta_Sans'] text-[10px] font-semibold uppercase tracking-widest">Settings</span>
+</a>
+</nav>
+</body></html>

@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "error": "#ba1a1a",
+                        "on-surface": "#1a1c1c",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-fixed-variant": "#454748",
+                        "outline": "#747878",
+                        "tertiary-fixed-dim": "#c4c7ca",
+                        "surface-tint": "#5f5e5e",
+                        "surface-container": "#eeeeee",
+                        "surface-container-highest": "#e2e2e2",
+                        "primary-container": "#1c1b1b",
+                        "tertiary-container": "#181c1e",
+                        "primary-fixed": "#e5e2e1",
+                        "tertiary-fixed": "#e0e3e6",
+                        "surface-container-lowest": "#ffffff",
+                        "inverse-on-surface": "#f0f1f1",
+                        "on-secondary-container": "#626566",
+                        "on-primary-container": "#858383",
+                        "surface-bright": "#f9f9f9",
+                        "inverse-surface": "#2f3131",
+                        "secondary-container": "#e1e3e4",
+                        "on-tertiary-fixed-variant": "#43474a",
+                        "outline-variant": "#c4c7c7",
+                        "secondary": "#5c5f60",
+                        "on-tertiary-container": "#818487",
+                        "on-primary-fixed": "#1c1b1b",
+                        "inverse-primary": "#c8c6c5",
+                        "on-surface-variant": "#444748",
+                        "on-tertiary-fixed": "#181c1e",
+                        "surface-variant": "#e2e2e2",
+                        "on-error-container": "#93000a",
+                        "on-background": "#1a1c1c",
+                        "primary": "#000000",
+                        "surface": "#f9f9f9",
+                        "on-secondary": "#ffffff",
+                        "surface-container-high": "#e8e8e8",
+                        "on-primary": "#ffffff",
+                        "background": "#f9f9f9",
+                        "surface-dim": "#dadada",
+                        "surface-container-low": "#f3f3f4",
+                        "primary-fixed-dim": "#c8c6c5",
+                        "secondary-fixed": "#e1e3e4",
+                        "on-secondary-fixed": "#191c1d",
+                        "secondary-fixed-dim": "#c5c7c8",
+                        "on-primary-fixed-variant": "#474746",
+                        "on-error": "#ffffff",
+                        "tertiary": "#000000",
+                        "error-container": "#ffdad6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "margin-desktop": "64px",
+                        "section-padding": "80px",
+                        "container-max": "1280px",
+                        "margin-mobile": "16px",
+                        "gutter": "24px",
+                        "unit": "8px"
+                    },
+                    "fontFamily": {
+                        "body-lg": ["Manrope"],
+                        "headline-xl": ["Manrope"],
+                        "headline-md": ["Manrope"],
+                        "headline-lg": ["Manrope"],
+                        "caption": ["Manrope"],
+                        "body-md": ["Manrope"],
+                        "label-md": ["Manrope"]
+                    },
+                    "fontSize": {
+                        "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "headline-xl": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-md": ["24px", {"lineHeight": "1.3", "fontWeight": "600"}],
+                        "headline-lg": ["32px", {"lineHeight": "1.2", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "caption": ["12px", {"lineHeight": "1.4", "fontWeight": "500"}],
+                        "body-md": ["16px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                        "label-md": ["14px", {"lineHeight": "1.0", "letterSpacing": "0.05em", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-container {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .ambient-shadow {
+            box-shadow: 0 40px 60px -15px rgba(0, 0, 0, 0.05);
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background font-body-md text-on-background min-h-screen">
+<!-- Top Navigation Anchor -->
+<header class="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-6 py-4 bg-white/60 backdrop-blur-[20px] border-b border-white/50 shadow-[0_20px_40px_rgba(0,0,0,0.02)]">
+<div class="text-lg font-bold text-gray-950 font-['Manrope'] tracking-tight">Search Locations</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-gray-900 hover:bg-white/40 transition-colors active:scale-[0.98] transition-transform duration-200">
+<span class="material-symbols-outlined">search</span>
+</button>
+<button class="p-2 text-gray-900 hover:bg-white/40 transition-colors active:scale-[0.98] transition-transform duration-200">
+<span class="material-symbols-outlined">tune</span>
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="pt-24 pb-32 px-4 md:px-margin-desktop max-w-container-max mx-auto min-h-screen relative">
+<!-- Background Map Simulation -->
+<div class="fixed inset-0 z-0 overflow-hidden">
+<img class="w-full h-full object-cover opacity-30 grayscale blur-sm" data-alt="abstract aerial city map view with soft pastel tones and minimal linework under bright morning light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1dBwcl0m173Q61mioelaAkdHtrilVPlZYfad0pFfnL8ffxpeMdiQ1i5EUCf6qTjaxI97NJoXl_87cJ8ZZpvJrZFvgQmlFTaSZUfs6rNtXa1dMvaprpH9fPu5_6BJ20Uq8NGPrOWzc_U65jGW1VNRAzLGmZ-xtkjy_jUbW7JM440f1aEvu2wZSP3_oaCqyPEW8DFVGK1eUO5uBQbDyImUBCGFENFdPYyU8LXI37JozLKwUQFmcTCS1ayRFzfbrdraO9oQTlJ1L1gc"/>
+</div>
+<!-- Search Overlay Layer -->
+<div class="relative z-10 max-w-2xl mx-auto">
+<!-- Floating Glass Search Bar -->
+<div class="glass-container ambient-shadow rounded-2xl p-2 mb-8 flex items-center gap-4 px-6 py-4">
+<span class="material-symbols-outlined text-outline">search</span>
+<input class="bg-transparent border-none focus:ring-0 w-full font-body-md text-on-surface placeholder:text-outline/50" placeholder="Search for luxury destinations..." type="text" value="Fine Dining"/>
+<div class="h-6 w-[1px] bg-outline-variant mx-2"></div>
+<button class="flex items-center gap-2 text-label-md font-semibold text-primary px-2">
+<span class="material-symbols-outlined text-sm">near_me</span>
+<span>Nearby</span>
+</button>
+</div>
+<!-- Results List -->
+<div class="space-y-4">
+<!-- Card 1 -->
+<div class="glass-container ambient-shadow rounded-2xl p-6 flex items-center gap-6 group hover:bg-white/80 transition-all cursor-pointer">
+<div class="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="close-up of a crystal glass cocktail with a floral garnish in a high-end luxury bar setting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDhI78zTGKxzK34c90piMm30OUKjFS2aA3H7XWg1P7XsYnhLLb8Wlo3_bVIZ6wFj9Uip2YZYwlbzElfoC8OJ-1VTyfux8Vrsuc1TAhm8CItzOW_lBqLHvd8x9NSfRg52AUxHim401-O_8frECFuADyksFx4UB_4uQG6M2BMh8Rxe8duhCu19S_VkUhtU0fJuAS7yogYSoys7rfGsYlt1AOIr5WzJOJxsoYpUkPid3MItaVAYiEx9RsrUUFp5L3LL0gCZUFpvo68iJQ"/>
+</div>
+<div class="flex-grow">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-headline-md text-on-surface">The Gilded Lily</h3>
+<span class="text-caption text-outline font-semibold">0.4 miles</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1 py-1 px-3 bg-surface-container rounded-full">
+<span class="material-symbols-outlined text-sm">restaurant</span>
+<span class="text-caption">Fine Dining</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm text-yellow-500" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-caption font-bold">4.9</span>
+</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:translate-x-1 transition-transform">chevron_right</span>
+</div>
+<!-- Card 2 -->
+<div class="glass-container ambient-shadow rounded-2xl p-6 flex items-center gap-6 group hover:bg-white/80 transition-all cursor-pointer">
+<div class="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="serene luxury spa interior with white marble and soft ambient lighting reflecting on still water" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAlF7bK_lMVTSqNyIT8YcY1N6BHOr9lWNbmWcl9SiSFZQvMSkTo7hNg88yYHEInlnEfahByOtzonga7kJWCIih9wa3NOc8bi2AeHLxLwv82K0uByc1U1_C1QkCrZ8F3z20DTkPRIM-favXFb8TRe6CqIo4xm7kysZwY-j7Zt4En4aYgo6mFK7P3Bx0PXPxNFCQg3ZCrhKgzeUM0czAMUDiyecW9FvTavD0QVnz487HXuKEAlm8kPnYfsulaYWdWJqb8cuJ3x5vgaFE"/>
+</div>
+<div class="flex-grow">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-headline-md text-on-surface">Aether Wellness</h3>
+<span class="text-caption text-outline font-semibold">1.2 miles</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1 py-1 px-3 bg-surface-container rounded-full">
+<span class="material-symbols-outlined text-sm">spa</span>
+<span class="text-caption">Spa &amp; Retreat</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm text-yellow-500" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-caption font-bold">5.0</span>
+</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:translate-x-1 transition-transform">chevron_right</span>
+</div>
+<!-- Card 3 -->
+<div class="glass-container ambient-shadow rounded-2xl p-6 flex items-center gap-6 group hover:bg-white/80 transition-all cursor-pointer">
+<div class="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="minimalist boutique interior with curated designer clothing on sleek metal racks in a bright airy space" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCGNEUbG2ZaJvg_VNUQEf9NTmCGOawHIOZgiGCBzrh3yP7pbPc9n0xGR_xLMDmuedjDBVQKSw0AKQCzhw2ZFJYIhONAjZXkWR0_KJb3XELqJs_2_tCiTfuvF6CiuAXLYaVtGKheApdQQ8FI9nh86VVbITnebudDjuzx7eWHWbMCRutpSQYhrtitErxzRID7hh0Wt_6eXZfsMoIljbmerdto6JgmGLtcflcWQPgvBH4mYLKPaFBCiL9IDJZX2A8Kcp2Q5ZtRKYTRW4M"/>
+</div>
+<div class="flex-grow">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-headline-md text-on-surface">Crystalline Boutique</h3>
+<span class="text-caption text-outline font-semibold">0.8 miles</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1 py-1 px-3 bg-surface-container rounded-full">
+<span class="material-symbols-outlined text-sm">shopping_bag</span>
+<span class="text-caption">Luxury Retail</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm text-yellow-500" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-caption font-bold">4.8</span>
+</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:translate-x-1 transition-transform">chevron_right</span>
+</div>
+<!-- Card 4 -->
+<div class="glass-container ambient-shadow rounded-2xl p-6 flex items-center gap-6 group hover:bg-white/80 transition-all cursor-pointer">
+<div class="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="modern specialty coffee shop with clean white surfaces and high-end espresso machine in soft natural light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC6uQmeCkjn5Yo2hWjGgEdfRB4HBMVg59KTbBTvQAB88v1E194jBl3C2t4_wqyf-pdNOf0tp6C74H3YF9t0VBpzfSeX7X2yTK5eZYpLtUaLHV9Ez27_aLK5V6Fj130exuAl4syAwySpuFczB2n3R6C5AYxQo4dJjWMzVltdkZbsnpESGCwWHOt0lmaJPAy84feeKTWvHuJKJ6bDNT9YvvLi7tBDsQalshJalG6otcn56ZYTiSwC3xmtiG_ZJollyhNAzibgJQppjIM"/>
+</div>
+<div class="flex-grow">
+<div class="flex justify-between items-start mb-1">
+<h3 class="font-headline-md text-on-surface">Noir Café</h3>
+<span class="text-caption text-outline font-semibold">2.4 miles</span>
+</div>
+<div class="flex items-center gap-3">
+<div class="flex items-center gap-1 py-1 px-3 bg-surface-container rounded-full">
+<span class="material-symbols-outlined text-sm">local_cafe</span>
+<span class="text-caption">Artisan Coffee</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-sm text-yellow-500" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="text-caption font-bold">4.7</span>
+</div>
+</div>
+</div>
+<span class="material-symbols-outlined text-outline group-hover:translate-x-1 transition-transform">chevron_right</span>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Shell -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-3 pb-safe bg-white/70 backdrop-blur-[20px] border-t border-white/50 shadow-[0_-10px_40px_rgba(0,0,0,0.03)] rounded-t-2xl">
+<button class="flex flex-col items-center justify-center text-gray-400 px-4 py-1 hover:text-gray-600 transition-all active:scale-90 transition-transform">
+<span class="material-symbols-outlined">explore</span>
+<span class="font-['Manrope'] text-[11px] font-semibold">Explore</span>
+</button>
+<button class="flex flex-col items-center justify-center text-gray-400 px-4 py-1 hover:text-gray-600 transition-all active:scale-90 transition-transform">
+<span class="material-symbols-outlined">bookmark</span>
+<span class="font-['Manrope'] text-[11px] font-semibold">Saved</span>
+</button>
+<button class="flex flex-col items-center justify-center text-gray-950 bg-white/40 rounded-xl px-4 py-1 shadow-sm active:scale-90 transition-transform">
+<span class="material-symbols-outlined">search</span>
+<span class="font-['Manrope'] text-[11px] font-semibold">Search</span>
+</button>
+<button class="flex flex-col items-center justify-center text-gray-400 px-4 py-1 hover:text-gray-600 transition-all active:scale-90 transition-transform">
+<span class="material-symbols-outlined">person</span>
+<span class="font-['Manrope'] text-[11px] font-semibold">Profile</span>
+</button>
+</nav>
+</body></html>

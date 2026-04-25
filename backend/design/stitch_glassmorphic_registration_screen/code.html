@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Register - Etheric Glass</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-tertiary-container": "#ffefe7",
+                    "surface-bright": "#f9f9fe",
+                    "surface": "#f9f9fe",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary-container": "#a6a5fe",
+                    "on-tertiary-fixed-variant": "#723600",
+                    "surface-container-highest": "#e2e2e7",
+                    "primary-fixed-dim": "#c2c1ff",
+                    "tertiary-fixed": "#ffdcc6",
+                    "on-primary-container": "#f4f1ff",
+                    "on-tertiary-fixed": "#311300",
+                    "tertiary": "#894200",
+                    "outline-variant": "#c7c4d7",
+                    "primary": "#4441cc",
+                    "on-primary": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "surface-variant": "#e2e2e7",
+                    "secondary": "#5655a7",
+                    "surface-container-low": "#f3f3f8",
+                    "error-container": "#ffdad6",
+                    "on-surface": "#1a1c1f",
+                    "surface-container": "#ededf2",
+                    "on-background": "#1a1c1f",
+                    "inverse-primary": "#c2c1ff",
+                    "on-tertiary": "#ffffff",
+                    "surface-tint": "#4d4ad5",
+                    "on-error-container": "#93000a",
+                    "on-secondary-fixed-variant": "#3e3c8e",
+                    "outline": "#777586",
+                    "secondary-fixed-dim": "#c2c1ff",
+                    "on-surface-variant": "#464554",
+                    "on-secondary-container": "#383788",
+                    "error": "#ba1a1a",
+                    "surface-dim": "#d9dade",
+                    "tertiary-container": "#ae5600",
+                    "on-primary-fixed": "#0c006b",
+                    "background": "#f9f9fe",
+                    "on-error": "#ffffff",
+                    "surface-container-high": "#e8e8ed",
+                    "on-primary-fixed-variant": "#332dbc",
+                    "primary-fixed": "#e2dfff",
+                    "tertiary-fixed-dim": "#ffb786",
+                    "on-secondary-fixed": "#0f0662",
+                    "inverse-surface": "#2e3034",
+                    "secondary-fixed": "#e2dfff",
+                    "inverse-on-surface": "#f0f0f5",
+                    "primary-container": "#5e5ce6"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "gutter": "16px",
+                    "stack-md": "16px",
+                    "stack-lg": "32px",
+                    "margin-page": "24px",
+                    "stack-sm": "8px",
+                    "unit": "4px"
+            },
+            "fontFamily": {
+                    "button-text": ["Manrope"],
+                    "body-md": ["Manrope"],
+                    "headline-md": ["Manrope"],
+                    "headline-lg": ["Manrope"],
+                    "body-lg": ["Manrope"],
+                    "label-caps": ["Manrope"]
+            },
+            "fontSize": {
+                    "button-text": ["16px", {"lineHeight": "24px", "fontWeight": "600"}],
+                    "body-md": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .glass-input {
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        .bg-mesh {
+            background-color: #f9f9fe;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(94, 92, 230, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(166, 165, 254, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(94, 92, 230, 0.15) 0px, transparent 50%),
+                radial-gradient(at 0% 100%, rgba(166, 165, 254, 0.1) 0px, transparent 50%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-mesh min-h-screen text-on-background font-body-md overflow-x-hidden">
+<!-- Top Navigation Bar -->
+<header class="fixed top-0 left-0 w-full z-50 flex items-center justify-between px-6 py-4 bg-white/70 backdrop-blur-xl border-b border-white/30 shadow-[0_8px_32px_0_rgba(94,92,230,0.1)]">
+<div class="flex items-center gap-4">
+<button class="active:scale-95 transition-transform duration-200 text-indigo-600">
+<span class="material-symbols-outlined" data-icon="arrow_back">arrow_back</span>
+</button>
+<h1 class="text-xl font-extrabold text-indigo-600 font-manrope antialiased tracking-tight">Register</h1>
+</div>
+<div class="w-10 h-10 rounded-full bg-indigo-50/50 flex items-center justify-center text-indigo-600">
+<span class="material-symbols-outlined" data-icon="help_outline">help_outline</span>
+</div>
+</header>
+<main class="pt-24 pb-32 px-margin-page max-w-lg mx-auto flex flex-col gap-stack-lg">
+<!-- Progress Indicator -->
+<div class="w-full flex flex-col gap-stack-sm">
+<div class="flex justify-between items-end mb-1">
+<span class="text-label-caps font-label-caps text-primary">STEP 1 OF 3</span>
+<span class="text-label-caps font-label-caps text-outline">PERSONAL INFO</span>
+</div>
+<div class="h-1.5 w-full bg-primary/10 rounded-full overflow-hidden">
+<div class="h-full w-1/3 bg-primary rounded-full"></div>
+</div>
+</div>
+<!-- Welcome Text -->
+<section class="flex flex-col gap-stack-sm">
+<h2 class="text-headline-lg font-headline-lg text-on-surface">Create your account</h2>
+<p class="text-body-lg font-body-lg text-on-surface-variant">Join our community of creators and thinkers.</p>
+</section>
+<!-- Form Section -->
+<div class="glass-card rounded-[32px] p-8 shadow-[0_8px_32px_0_rgba(94,92,230,0.1)] flex flex-col gap-stack-md">
+<!-- Nickname Field -->
+<div class="flex flex-col gap-unit">
+<label class="text-label-caps font-label-caps text-on-surface-variant px-1" for="nickname">NICKNAME</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline text-[20px]" data-icon="face">face</span>
+<input class="glass-input w-full pl-12 pr-4 py-4 rounded-2xl text-body-md font-body-md text-on-surface focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none placeholder:text-outline/60" id="nickname" placeholder="How should we call you?" type="text"/>
+</div>
+</div>
+<!-- Email Field -->
+<div class="flex flex-col gap-unit">
+<label class="text-label-caps font-label-caps text-on-surface-variant px-1" for="email">EMAIL ADDRESS</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline text-[20px]" data-icon="mail">mail</span>
+<input class="glass-input w-full pl-12 pr-4 py-4 rounded-2xl text-body-md font-body-md text-on-surface focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none placeholder:text-outline/60" id="email" placeholder="hello@example.com" type="email"/>
+</div>
+</div>
+<!-- Password Field -->
+<div class="flex flex-col gap-unit">
+<label class="text-label-caps font-label-caps text-on-surface-variant px-1" for="password">PASSWORD</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline text-[20px]" data-icon="lock">lock</span>
+<input class="glass-input w-full pl-12 pr-12 py-4 rounded-2xl text-body-md font-body-md text-on-surface focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none placeholder:text-outline/60" id="password" placeholder="Min. 8 characters" type="password"/>
+<button class="absolute right-4 top-1/2 -translate-y-1/2 text-outline hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[20px]" data-icon="visibility">visibility</span>
+</button>
+</div>
+</div>
+<!-- Terms Checkbox -->
+<div class="flex items-start gap-3 mt-2 px-1">
+<div class="relative flex items-center h-5">
+<input class="w-5 h-5 rounded border-white/40 bg-white/20 text-primary focus:ring-primary/30" id="terms" type="checkbox"/>
+</div>
+<label class="text-body-md font-body-md text-on-surface-variant" for="terms">
+                    I agree to the <span class="text-primary font-semibold">Terms of Service</span> and <span class="text-primary font-semibold">Privacy Policy</span>.
+                </label>
+</div>
+</div>
+<!-- Social Register (Asymmetric Layout Element) -->
+<div class="flex items-center gap-4 py-2">
+<div class="flex-grow h-[1px] bg-outline-variant/30"></div>
+<span class="text-label-caps font-label-caps text-outline shrink-0">OR REGISTER WITH</span>
+<div class="flex-grow h-[1px] bg-outline-variant/30"></div>
+</div>
+<div class="grid grid-cols-2 gap-4">
+<button class="glass-card flex items-center justify-center gap-2 py-4 rounded-2xl active:scale-95 transition-all text-on-surface font-button-text">
+<div class="w-5 h-5 rounded-full overflow-hidden">
+<img alt="Google" class="w-full h-full object-cover" data-alt="minimalist circular colorful icon representing a modern tech brand logo on a clean background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBg4mC_zkMWQVFVASYDyVNI5vVVKrbD5-isic2_EP-x0mbOSk9F1uahPUOEfzVzGyOLEUxretuHdfxyaYbG-vNimdfL581yzfpzpb-xxHQg-y9iJtJICDL7YYjO5K0kVlobcrB560z4UmC20FAr09Dkx3HSDvdIadhfTU7vH0F8imb_VNkjtC5doRcAf9amNDh5Qc2mFlEKAq98bjOh6bnESIYcVPF1g_fA-2uwPo3oPfCG6u64iGxxS33AQAFuwMVG8F8ON43ceA"/>
+</div>
+                Google
+            </button>
+<button class="glass-card flex items-center justify-center gap-2 py-4 rounded-2xl active:scale-95 transition-all text-on-surface font-button-text">
+<div class="w-5 h-5 rounded-full overflow-hidden">
+<img alt="Apple" class="w-full h-full object-cover" data-alt="minimalist black icon representing a modern tech brand logo on a clean white background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCrIOrxeEBgXcWydJqg2NNBTGbRcgXYN7ck5gD0v3gmvOscovBEjZMR094xXjxtSrTZaL4z5n4Qoa48KBzrLoRikCqFL6ec9lX0YfuFGepmAWSIjrbL87TkuUdGX-mo96dG5X162LquQyLuVzTxdjpPQGkVuSwT1Wp0FFkPRQQYy56Jo0fRm7cSZZNePQ8naOJHQfX_KjPWlHcnjWTzwGOMQuhkZ7L-8Nipoh9NsGu0yWxU0bUF4CksFxtYyz65oJumDOe6bCMXGw"/>
+</div>
+                Apple
+            </button>
+</div>
+</main>
+<!-- Floating Next Button -->
+<div class="fixed bottom-0 left-0 w-full p-margin-page z-50">
+<div class="max-w-lg mx-auto">
+<button class="w-full bg-primary text-on-primary py-5 rounded-[24px] font-button-text text-button-text shadow-[0_12px_40px_0_rgba(94,92,230,0.3)] hover:shadow-[0_16px_48px_0_rgba(94,92,230,0.4)] active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                Continue to interests
+                <span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+<!-- Background Decorative Element -->
+<div class="fixed top-[20%] -right-20 w-64 h-64 bg-primary-container/20 blur-[100px] rounded-full pointer-events-none -z-10"></div>
+<div class="fixed bottom-[10%] -left-20 w-80 h-80 bg-secondary-container/20 blur-[120px] rounded-full pointer-events-none -z-10"></div>
+</body></html>
