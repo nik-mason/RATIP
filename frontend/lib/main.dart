@@ -1,8 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:ratip/theme/app_theme.dart';
 import 'package:ratip/screens/splash_screen.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  await dotenv.load(fileName: ".env");
+  
+  await Supabase.initialize(
+    url: dotenv.env['SUPABASE_URL'] ?? '',
+    anonKey: dotenv.env['SUPABASE_ANON_KEY'] ?? '',
+  );
+
   runApp(
     const ProviderScope(
       child: RatipApp(),
@@ -18,15 +30,7 @@ class RatipApp extends StatelessWidget {
     return MaterialApp(
       title: 'Ratip',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF070235),
-          primary: const Color(0xFF070235),
-          secondary: const Color(0xFF006A61),
-          surface: const Color(0xFFF8F9FF),
-        ),
-      ),
+      theme: AppTheme.lightTheme,
       home: const SplashScreen(),
     );
   }

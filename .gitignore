@@ -1,0 +1,12 @@
+.env
+*.env
+.flutter-plugins
+.flutter-plugins-dependencies
+.dart_tool/
+build/
+ios/.generated/
+android/app/src/main/res/drawable-*/
+android/app/src/main/res/mipmap-*/
+ios/Flutter/Generated.xcconfig
+ios/Flutter/flutter_export_environment.sh
+pubspec.lock

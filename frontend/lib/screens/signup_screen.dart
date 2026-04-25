@@ -1,0 +1,230 @@
+import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:animate_do/animate_do.dart';
+import 'package:ratip/theme/app_theme.dart';
+import 'package:ratip/widgets/glass_container.dart';
+import 'package:ratip/widgets/glass_text_field.dart';
+
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
+
+  @override
+  State<SignUpScreen> createState() => _SignUpScreenState();
+}
+
+class _SignUpScreenState extends State<SignUpScreen> {
+  final _nicknameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  bool _isLoading = false;
+  bool _obscurePassword = true;
+
+  Future<void> _signUp() async {
+    if (_nicknameController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please enter a nickname'), backgroundColor: Colors.red),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+    try {
+      final response = await Supabase.instance.client.auth.signUp(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+        data: {'nickname': _nicknameController.text.trim()},
+      );
+      
+      if (mounted) {
+        if (response.user != null) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Sign Up Successful! Please check your email.')),
+          );
+          Navigator.pop(context);
+        }
+      }
+    } on AuthException catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(error.message), backgroundColor: Colors.red),
+        );
+      }
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Unexpected error occurred'), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Stack(
+        children: [
+          // Background Gradient
+          Container(
+            decoration: BoxDecoration(
+              gradient: AppTheme.etherealGradient,
+            ),
+          ),
+          
+          // Back Button
+          Positioned(
+            top: 40,
+            left: 20,
+            child: IconButton(
+              icon: const Icon(Icons.arrow_back_ios_new, color: AppTheme.onSurface),
+              onPressed: () => Navigator.pop(context),
+            ),
+          ),
+
+          // Content
+          SafeArea(
+            child: Center(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(24.0),
+                child: FadeInUp(
+                  duration: const Duration(milliseconds: 800),
+                  child: GlassContainer(
+                    padding: const EdgeInsets.all(32.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        // Title
+                        FadeInDown(
+                          delay: const Duration(milliseconds: 200),
+                          child: Column(
+                            children: [
+                              Text(
+                                'Create Account',
+                                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: AppTheme.onSurface,
+                                    ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                'Join the Ratip community today',
+                                textAlign: TextAlign.center,
+                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: AppTheme.onSurfaceVariant,
+                                    ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(height: 40),
+
+                        // Form
+                        GlassTextField(
+                          controller: _nicknameController,
+                          label: 'Nickname',
+                          hintText: 'How should we call you?',
+                          icon: Icons.person_outline,
+                        ),
+                        const SizedBox(height: 20),
+                        GlassTextField(
+                          controller: _emailController,
+                          label: 'Email address',
+                          hintText: 'name@company.com',
+                          icon: Icons.mail_outline,
+                        ),
+                        const SizedBox(height: 20),
+                        GlassTextField(
+                          controller: _passwordController,
+                          label: 'Password',
+                          hintText: '••••••••',
+                          icon: Icons.lock_outline,
+                          isPassword: _obscurePassword,
+                          suffixIcon: IconButton(
+                            icon: Icon(
+                              _obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                              size: 20,
+                              color: AppTheme.outline,
+                            ),
+                            onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                          ),
+                        ),
+                        const SizedBox(height: 40),
+
+                        // Sign Up Button
+                        SizedBox(
+                          width: double.infinity,
+                          height: 56,
+                          child: ElevatedButton(
+                            onPressed: _isLoading ? null : _signUp,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppTheme.primaryContainer,
+                              foregroundColor: AppTheme.onPrimaryContainer,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              elevation: 0,
+                            ),
+                            child: _isLoading
+                                ? const SizedBox(
+                                    height: 24,
+                                    width: 24,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      color: Colors.white,
+                                    ),
+                                  )
+                                : const Text(
+                                    'Create Account',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                          ),
+                        ),
+                        const SizedBox(height: 32),
+
+                        // Footer
+                        Text(
+                          'By signing up, you agree to our Terms and Privacy Policy.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: AppTheme.onSurfaceVariant.withOpacity(0.7),
+                          ),
+                        ),
+                        const SizedBox(height: 24),
+
+                        // Sign In Link
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Text(
+                              "Already have an account? ",
+                              style: TextStyle(color: AppTheme.onSurfaceVariant),
+                            ),
+                            GestureDetector(
+                              onTap: () => Navigator.pop(context),
+                              child: const Text(
+                                'Sign In',
+                                style: TextStyle(
+                                  color: AppTheme.primaryColor,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
