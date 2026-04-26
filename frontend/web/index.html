@@ -19,43 +19,63 @@
   <title>ratip</title>
   <link rel="manifest" href="manifest.json">
 
+  <script src="flutter.js" defer></script>
+  
   <style>
-    .loading {
+    body {
+      background-color: #F8F9FF; /* Ratip background color */
       display: flex;
       justify-content: center;
       align-items: center;
+      height: 100vh;
       margin: 0;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
       font-family: sans-serif;
+    }
+    .loading-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .loader {
+      border: 4px solid #E1E0FF;
+      border-top: 4px solid #4648D4; /* Ratip primary color */
+      border-radius: 50%;
+      width: 48px;
+      height: 48px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 16px;
+    }
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    .loading-text {
       color: #4648D4;
+      font-weight: bold;
     }
   </style>
-
-  <script>
-    var serviceWorkerVersion = '{{flutter_service_worker_version}}';
-  </script>
-  <script src="flutter.js" defer></script>
 </head>
-<body style="background-color: #F8F9FF;">
-  <div id="loading-indicator" class="loading">
-    <h2>Loading Ratip...</h2>
+<body>
+  <div class="loading-container" id="loading-indicator">
+    <div class="loader"></div>
+    <div class="loading-text">Loading Ratip...</div>
   </div>
 
   <script>
     window.addEventListener('load', function(ev) {
-      _flutter.loader.load({
+      // Revert to loadEntrypoint as it is most stable across 3.x despite warnings
+      _flutter.loader.loadEntrypoint({
         serviceWorker: {
-          serviceWorkerVersion: serviceWorkerVersion,
+          serviceWorkerVersion: '{{flutter_service_worker_version}}',
         },
         onEntrypointLoaded: function(engineInitializer) {
           engineInitializer.initializeEngine().then(function(appRunner) {
-            // Hide loading indicator when app is ready
-            var loading = document.getElementById("loading-indicator");
-            if (loading) loading.style.display = "none";
+            // Remove loading indicator when Flutter is ready
+            document.getElementById('loading-indicator').remove();
             appRunner.runApp();
+          }).catch(function(error) {
+            console.error("Flutter initialization failed:", error);
+            document.querySelector('.loading-text').innerText = "Error loading app.";
           });
         }
       });

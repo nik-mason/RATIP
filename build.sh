@@ -27,7 +27,7 @@ flutter pub get
 
 echo "Step 4: Flutter Build Web..."
 # 가장 인자가 적고 안전한 릴리즈 빌드
-flutter build web --release --web-renderer auto
+flutter build web --release
 
 # 3. 배포 폴더 정리
 cd ..
