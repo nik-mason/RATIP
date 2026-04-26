@@ -21,10 +21,13 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen> {
     setState(() => _isAuthenticating = false);
 
     if (success && mounted) {
+      // TODO(Phase 3): Navigate to MainMapScreen
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Authentication Successful!')),
+        const SnackBar(
+          content: Text('✅ 인증 성공! 메인 화면으로 이동 예정입니다.'),
+          backgroundColor: Color(0xFF4648D4),
+        ),
       );
-      // Navigate to Home
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Authentication Failed'), backgroundColor: Colors.red),

@@ -5,6 +5,7 @@ import 'package:ratip/theme/app_theme.dart';
 import 'package:ratip/widgets/glass_container.dart';
 import 'package:ratip/widgets/glass_text_field.dart';
 import 'package:ratip/screens/signup_screen.dart';
+import 'package:ratip/screens/biometric_auth_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -27,9 +28,9 @@ class _LoginScreenState extends State<LoginScreen> {
         password: _passwordController.text.trim(),
       );
       if (mounted) {
-        // Navigate to home screen (Phase 3)
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Login Successful!')),
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const BiometricAuthScreen()),
         );
       }
     } on AuthException catch (error) {
@@ -178,7 +179,23 @@ class _LoginScreenState extends State<LoginScreen> {
                                   ),
                           ),
                         ),
-                        const SizedBox(height: 40),
+                        const SizedBox(height: 12),
+
+                        // Biometric Quick Login
+                        TextButton.icon(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(builder: (context) => const BiometricAuthScreen()),
+                            );
+                          },
+                          icon: const Icon(Icons.fingerprint, color: AppTheme.primaryColor),
+                          label: const Text(
+                            'Use Biometrics instead',
+                            style: TextStyle(color: AppTheme.primaryColor),
+                          ),
+                        ),
+                        const SizedBox(height: 28),
 
                         // Social Login
                         Row(
