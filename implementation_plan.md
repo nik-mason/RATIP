@@ -25,7 +25,7 @@
 ## 🗺️ Phase 3: 지도 & 탐험 시스템
 8. **[MEDIUM]** **[UI]** 메인 지도 화면 레이아웃 & 하단 네비게이션 바
    - 🤖 **AI**: Gemini 3 Flash
-9. **[MEDIUM]** Naver Map SDK 연동 및 기본 설정
+9. **[MEDIUM]** Kakao Map SDK 연동 및 기본 설정
    - 🤖 **AI**: Gemini 3.1 Pro (High)
 10. **[EASY]** 실시간 내 위치 추적 마커 구현
     - 🤖 **AI**: Gemini 3.1 Pro (Low)
@@ -83,7 +83,7 @@
     - 🤖 **AI**: Gemini 3 Flash
 
 ## 🚗 Phase 7: 네비게이션 & 폴리싱
-34. **[HARD]** Naver Map Navigation SDK 연동 (실시간 경로)
+34. **[HARD]** Kakao Map Navigation 연동 (또는 외부 앱 연결)
     - 🤖 **AI**: Gemini 3.1 Pro (High)
 35. **[MEDIUM]** **[UI]** 주행 정보 오버레이 (시간, 거리 표시)
     - 🤖 **AI**: Gemini 3 Flash

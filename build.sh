@@ -9,9 +9,10 @@ pwd
 ls -la
 
 # 1. Flutter SDK 다운로드 및 설치
+FLUTTER_VERSION="3.27.4"
 if [ ! -d "flutter" ]; then
-  echo "Downloading Flutter SDK..."
-  curl -L -o flutter.tar.xz https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_3.19.6-stable.tar.xz
+  echo "Downloading Flutter SDK ${FLUTTER_VERSION}..."
+  curl -L -o flutter.tar.xz "https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_${FLUTTER_VERSION}-stable.tar.xz"
   echo "Extracting Flutter SDK..."
   tar -xf flutter.tar.xz
   rm flutter.tar.xz
@@ -23,10 +24,17 @@ git config --global --add safe.directory "$(pwd)"
 
 export PATH="$PATH:$(pwd)/flutter/bin"
 flutter config --no-analytics
+flutter config --enable-web
 flutter doctor -v
 
-# 2. 의존성 설치 및 빌드
+# 2. .env 파일이 없으면 example에서 복사
 cd frontend
+if [ ! -f "assets/.env" ]; then
+  echo "No .env found, copying from example..."
+  mkdir -p assets
+  cp ../.env.example assets/.env
+fi
+
 echo "Flutter Pub Get..."
 flutter pub get
 
