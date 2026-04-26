@@ -38,12 +38,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
       if (mounted) {
         if (response.user != null) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Sign Up Successful! Please register your Face ID.')),
+            const SnackBar(
+              content: Text('✅ 인증 이메일이 발송되었습니다. 메일함을 확인해주세요!'),
+              backgroundColor: Color(0xFF4648D4),
+            ),
           );
-          Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => const BiometricAuthScreen()),
-          );
+          Navigator.pop(context); // 로그인 화면으로 돌아가기
         }
       }
     } on AuthException catch (error) {
