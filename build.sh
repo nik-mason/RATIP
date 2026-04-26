@@ -9,7 +9,7 @@ pwd
 ls -la
 
 # 1. Flutter SDK 다운로드 및 설치
-FLUTTER_VERSION="3.27.4"
+FLUTTER_VERSION="3.24.5"
 if [ ! -d "flutter" ]; then
   echo "Downloading Flutter SDK ${FLUTTER_VERSION}..."
   curl -L -o flutter.tar.xz "https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_${FLUTTER_VERSION}-stable.tar.xz"
