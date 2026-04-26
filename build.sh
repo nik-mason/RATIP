@@ -1,15 +1,15 @@
 #!/bin/bash
 set -ex
 
-# Git 보안 경고 해결 (모든 경로 허용)
+# Git 보안 경고 해결
 git config --global --add safe.directory "*"
 
 echo "--- System Info ---"
 pwd
 ls -la
 
-# 1. Flutter SDK 다운로드 및 설치
-FLUTTER_VERSION="3.24.5"
+# 1. Flutter SDK 다운로드 및 설치 (3.24.3 버전 사용)
+FLUTTER_VERSION="3.24.3"
 if [ ! -d "flutter" ]; then
   echo "Downloading Flutter SDK ${FLUTTER_VERSION}..."
   curl -L -o flutter.tar.xz "https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_${FLUTTER_VERSION}-stable.tar.xz"
@@ -18,28 +18,18 @@ if [ ! -d "flutter" ]; then
   rm flutter.tar.xz
 fi
 
-# 추출 후 한 번 더 설정 (혹시 모를 상황 대비)
-git config --global --add safe.directory "$(pwd)/flutter"
-git config --global --add safe.directory "$(pwd)"
-
 export PATH="$PATH:$(pwd)/flutter/bin"
 flutter config --no-analytics
 flutter config --enable-web
-flutter doctor -v
 
-# 2. .env 파일이 없으면 example에서 복사
+# 2. 의존성 설치 및 빌드
 cd frontend
-if [ ! -f "assets/.env" ]; then
-  echo "No .env found, copying from example..."
-  mkdir -p assets
-  cp ../.env.example assets/.env
-fi
-
 echo "Flutter Pub Get..."
 flutter pub get
 
-echo "Flutter Build Web..."
-flutter build web --release
+echo "Flutter Build Web (HTML renderer for better compatibility)..."
+# canvaskit 대신 html 렌더러를 사용하여 빌드 부하를 줄임
+flutter build web --release --web-renderer html --no-tree-shake-icons
 
 # 3. 배포 폴더 정리
 cd ..
