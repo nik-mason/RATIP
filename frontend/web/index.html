@@ -20,6 +20,9 @@
   <title>ratip</title>
   <link rel="manifest" href="manifest.json">
 
+  <!-- 이 부분이 중요합니다: Flutter 빌드 도구가 필요한 설정을 주입합니다 -->
+  {{flutter_head_setup}}
+
   <style>
     body {
       background-color: #F8F9FF;
@@ -53,8 +56,6 @@
       font-weight: bold;
     }
   </style>
-  
-  <script src="flutter.js" defer></script>
 </head>
 <body>
   <div class="loading-container" id="loading-indicator">
@@ -62,13 +63,14 @@
     <div class="loading-text">Loading Ratip...</div>
   </div>
 
+  <!-- Flutter 빌드 도구가 여기에 flutter.js 및 초기화 스크립트를 주입합니다 -->
+  {{flutter_body_setup}}
+
   <script>
     window.addEventListener('load', function(ev) {
-      // Use the new Flutter 3.24+ loader API
+      // 최신 방식: _flutter.loader.load()를 인자 없이 호출하면 
+      // 빌드 도구가 주입한 buildConfig를 자동으로 사용합니다.
       _flutter.loader.load({
-        serviceWorkerSettings: {
-          serviceWorkerVersion: '{{flutter_service_worker_version}}',
-        },
         onEntrypointLoaded: function(engineInitializer) {
           engineInitializer.initializeEngine().then(function(appRunner) {
             const loader = document.getElementById('loading-indicator');
