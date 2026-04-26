@@ -1,27 +1,29 @@
 #!/bin/bash
 set -e
 
-echo "--- Fast Build Started ---"
+echo "--- Build Attempt with Standard Options ---"
 
-# 1. Flutter SDK 설치 (타르볼 다운로드보다 Git Clone이 Vercel에서 더 빠를 수 있음)
+# 1. Flutter SDK 설치
 if [ ! -d "flutter" ]; then
-  echo "Step 1: Cloning Flutter SDK (Stable branch)..."
+  echo "Step 1: Cloning Flutter SDK..."
   git clone --depth 1 --branch stable https://github.com/flutter/flutter.git
 fi
 
 export PATH="$PATH:$(pwd)/flutter/bin"
+# 처음 실행 시 도구 다운로드를 위해 프리레퀴짓 실행
+flutter doctor -v
+
 flutter config --no-analytics --enable-web
 
 # 2. 의존성 설치 및 빌드
 cd frontend
 
 echo "Step 2: Flutter Pub Get..."
-# clean 과정을 생략하여 시간 단축
 flutter pub get
 
 echo "Step 3: Flutter Build Web..."
-# 빌드 속도가 가장 빠른 html 렌더러 사용 및 병렬 빌드 시도
-flutter build web --release --web-renderer html --no-tree-shake-icons
+# 가장 표준적인 빌드 명령어로 변경 (옵션 최소화)
+flutter build web --release --web-renderer html
 
 # 3. 배포 폴더 정리
 cd ..
