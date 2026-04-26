@@ -18,8 +18,10 @@ cd frontend
 # .env 파일이 없으면 빌드 에러가 나므로 예제 파일 복사
 mkdir -p assets
 if [ ! -f "assets/.env" ]; then
-  echo "Step 2: Creating placeholder .env..."
-  cp ../.env.example assets/.env
+  echo "Step 2: Creating .env from environment variables..."
+  echo "SUPABASE_URL=\"$SUPABASE_URL\"" > assets/.env
+  echo "SUPABASE_ANON_KEY=\"$SUPABASE_ANON_KEY\"" >> assets/.env
+  echo "KAKAO_MAP_APP_KEY=\"$KAKAO_MAP_APP_KEY\"" >> assets/.env
 fi
 
 echo "Step 3: Flutter Pub Get..."
