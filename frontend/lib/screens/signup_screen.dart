@@ -4,7 +4,7 @@ import 'package:animate_do/animate_do.dart';
 import 'package:ratip/theme/app_theme.dart';
 import 'package:ratip/widgets/glass_container.dart';
 import 'package:ratip/widgets/glass_text_field.dart';
-
+import 'package:ratip/screens/biometric_auth_screen.dart';
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
 
@@ -38,9 +38,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
       if (mounted) {
         if (response.user != null) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Sign Up Successful! Please check your email.')),
+            const SnackBar(content: Text('Sign Up Successful! Please register your Face ID.')),
           );
-          Navigator.pop(context);
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const BiometricAuthScreen()),
+          );
         }
       }
     } on AuthException catch (error) {
