@@ -1,43 +1,31 @@
 #!/bin/bash
-# 에러 발생 시 즉시 중단 및 모든 명령어 출력
-set -ex
+set -e
 
-echo "--- Build Started ---"
+echo "--- Fast Build Started ---"
 
-# 1. Flutter SDK 설치
-FLUTTER_VERSION="3.24.3"
-FLUTTER_URL="https://storage.googleapis.com/flutter_infra_release/releases/stable/linux/flutter_linux_${FLUTTER_VERSION}-stable.tar.xz"
-
+# 1. Flutter SDK 설치 (타르볼 다운로드보다 Git Clone이 Vercel에서 더 빠를 수 있음)
 if [ ! -d "flutter" ]; then
-  echo "Step 1: Downloading Flutter SDK..."
-  # -f 옵션을 추가하여 다운로드 실패 시 에러 발생시킴
-  curl -fL -o flutter.tar.xz "$FLUTTER_URL" || { echo "Failed to download Flutter"; exit 1; }
-  
-  echo "Step 2: Extracting Flutter SDK..."
-  tar -xf flutter.tar.xz || { echo "Failed to extract Flutter"; exit 1; }
-  rm flutter.tar.xz
+  echo "Step 1: Cloning Flutter SDK (Stable branch)..."
+  git clone --depth 1 --branch stable https://github.com/flutter/flutter.git
 fi
 
-echo "Step 3: Setting PATH and Config..."
 export PATH="$PATH:$(pwd)/flutter/bin"
-flutter config --no-analytics
-flutter config --enable-web
+flutter config --no-analytics --enable-web
 
-# 2. 빌드 전 정리 및 의존성 설치
+# 2. 의존성 설치 및 빌드
 cd frontend
-echo "Step 4: Flutter Clean..."
-flutter clean
 
-echo "Step 5: Flutter Pub Get..."
-flutter pub get || { echo "Pub get failed"; exit 1; }
+echo "Step 2: Flutter Pub Get..."
+# clean 과정을 생략하여 시간 단축
+flutter pub get
 
-echo "Step 6: Flutter Build Web..."
-# 메모리 절약을 위해 더 안전한 옵션 사용
-flutter build web --release --web-renderer html --no-tree-shake-icons || { echo "Build failed"; exit 1; }
+echo "Step 3: Flutter Build Web..."
+# 빌드 속도가 가장 빠른 html 렌더러 사용 및 병렬 빌드 시도
+flutter build web --release --web-renderer html --no-tree-shake-icons
 
-# 3. 배포
+# 3. 배포 폴더 정리
 cd ..
-echo "Step 7: Preparing public directory..."
+echo "Step 4: Preparing public directory..."
 rm -rf public
 mkdir -p public
 cp -rv frontend/build/web/* public/
