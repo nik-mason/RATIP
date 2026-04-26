@@ -19,23 +19,42 @@
   <title>ratip</title>
   <link rel="manifest" href="manifest.json">
 
+  <style>
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin: 0;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-family: sans-serif;
+      color: #4648D4;
+    }
+  </style>
+
   <script>
-    // The value below is injected by flutter build, do not touch.
     var serviceWorkerVersion = '{{flutter_service_worker_version}}';
   </script>
-  <!-- This script adds the flutter initialization JS code -->
   <script src="flutter.js" defer></script>
 </head>
-<body>
+<body style="background-color: #F8F9FF;">
+  <div id="loading-indicator" class="loading">
+    <h2>Loading Ratip...</h2>
+  </div>
+
   <script>
     window.addEventListener('load', function(ev) {
-      // Download main.dart.js
       _flutter.loader.load({
         serviceWorker: {
           serviceWorkerVersion: serviceWorkerVersion,
         },
         onEntrypointLoaded: function(engineInitializer) {
           engineInitializer.initializeEngine().then(function(appRunner) {
+            // Hide loading indicator when app is ready
+            var loading = document.getElementById("loading-indicator");
+            if (loading) loading.style.display = "none";
             appRunner.runApp();
           });
         }
