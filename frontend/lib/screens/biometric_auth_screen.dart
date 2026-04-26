@@ -61,7 +61,7 @@ class _BiometricAuthScreenState extends State<BiometricAuthScreen> {
 
           // Content
           Center(
-            child: FadeInZoom(
+            child: ZoomIn(
               duration: const Duration(milliseconds: 500),
               child: GlassContainer(
                 padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 48),
