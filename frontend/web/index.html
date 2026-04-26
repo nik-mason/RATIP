@@ -20,9 +20,6 @@
   <title>ratip</title>
   <link rel="manifest" href="manifest.json">
 
-  <!-- 이 부분이 중요합니다: Flutter 빌드 도구가 필요한 설정을 주입합니다 -->
-  {{flutter_head_setup}}
-
   <style>
     body {
       background-color: #F8F9FF;
@@ -56,6 +53,9 @@
       font-weight: bold;
     }
   </style>
+  
+  <!-- flutter.js를 수동으로 로드 -->
+  <script src="flutter.js" defer></script>
 </head>
 <body>
   <div class="loading-container" id="loading-indicator">
@@ -63,14 +63,25 @@
     <div class="loading-text">Loading Ratip...</div>
   </div>
 
-  <!-- Flutter 빌드 도구가 여기에 flutter.js 및 초기화 스크립트를 주입합니다 -->
-  {{flutter_body_setup}}
-
   <script>
     window.addEventListener('load', function(ev) {
-      // 최신 방식: _flutter.loader.load()를 인자 없이 호출하면 
-      // 빌드 도구가 주입한 buildConfig를 자동으로 사용합니다.
-      _flutter.loader.load({
+      // 빌드 도구가 설정을 주입하지 못할 경우를 대비해 수동으로 설정
+      if (!window._flutter) {
+        window._flutter = {};
+      }
+      if (!window._flutter.buildConfig) {
+        window._flutter.buildConfig = {
+          "engineRevision": "36335019a8eab588c3c2ea783c618d90505be233",
+          "buildNumber": "1.0.0",
+          "mainDartFile": "main.dart"
+        };
+      }
+
+      // Flutter 초기화 시작
+      _flutter.loader.loadEntrypoint({
+        serviceWorker: {
+          serviceWorkerVersion: '{{flutter_service_worker_version}}',
+        },
         onEntrypointLoaded: function(engineInitializer) {
           engineInitializer.initializeEngine().then(function(appRunner) {
             const loader = document.getElementById('loading-indicator');
