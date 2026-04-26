@@ -135,14 +135,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
                           ),
                         ),
-                        const SizedBox(height: 12),
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: TextButton(
-                            onPressed: () {},
-                            child: const Text('Forgot?'),
-                          ),
-                        ),
                         const SizedBox(height: 32),
 
                         // Sign In Button
@@ -195,42 +187,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             style: TextStyle(color: AppTheme.primaryColor),
                           ),
                         ),
-                        const SizedBox(height: 28),
-
-                        // Social Login
-                        Row(
-                          children: [
-                            Expanded(child: Divider(color: Colors.white.withOpacity(0.5))),
-                            const Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 16),
-                              child: Text(
-                                'Or continue with',
-                                style: TextStyle(fontSize: 12, color: AppTheme.onSurfaceVariant),
-                              ),
-                            ),
-                            Expanded(child: Divider(color: Colors.white.withOpacity(0.5))),
-                          ],
-                        ),
-                        const SizedBox(height: 24),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: _SocialButton(
-                                icon: Icons.g_mobiledata,
-                                label: 'Google',
-                                onTap: () {},
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: _SocialButton(
-                                icon: Icons.apple,
-                                label: 'Apple',
-                                onTap: () {},
-                              ),
-                            ),
-                          ],
-                        ),
                         const SizedBox(height: 40),
 
                         // Sign Up Link
@@ -266,45 +222,6 @@ class _LoginScreenState extends State<LoginScreen> {
             ),
           ),
         ],
-      ),
-    );
-  }
-}
-
-class _SocialButton extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-
-  const _SocialButton({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: GlassContainer(
-        borderRadius: 16,
-        blur: 5,
-        opacity: 0.3,
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(icon, size: 24, color: AppTheme.onSurface),
-            const SizedBox(width: 8),
-            Text(
-              label,
-              style: const TextStyle(
-                fontWeight: FontWeight.w600,
-                color: AppTheme.onSurface,
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }
