@@ -10,48 +10,55 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMixin {
-  late AnimationController _fadeController;
-  late AnimationController _pulseController;
+class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
   late Animation<double> _fadeAnimation;
-  late Animation<double> _pulseAnimation;
+  late Animation<double> _scaleAnimation;
 
   @override
   void initState() {
     super.initState();
-    _fadeController = AnimationController(
+    _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1200),
-    );
-    _pulseController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 4),
-    )..repeat(reverse: true);
-
-    _fadeAnimation = CurvedAnimation(
-      parent: _fadeController,
-      curve: Curves.easeOutCubic,
-    );
-    _pulseAnimation = Tween<double>(begin: 1.0, end: 1.02).animate(
-      CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
+      duration: const Duration(milliseconds: 3000),
     );
 
-    _fadeController.forward();
+    _fadeAnimation = TweenSequence<double>([
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 0.0, end: 1.0).chain(CurveTween(curve: Curves.easeIn)),
+        weight: 30,
+      ),
+      TweenSequenceItem(
+        tween: ConstantTween<double>(1.0),
+        weight: 40,
+      ),
+      TweenSequenceItem(
+        tween: Tween<double>(begin: 1.0, end: 0.0).chain(CurveTween(curve: Curves.easeOut)),
+        weight: 30,
+      ),
+    ]).animate(_controller);
 
-    Future.delayed(const Duration(milliseconds: 3500), () {
-      if (mounted) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const LoginScreen()),
-        );
+    _scaleAnimation = Tween<double>(begin: 0.8, end: 1.5).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOutBack),
+    );
+
+    _controller.forward();
+
+    _controller.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        if (mounted) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const LoginScreen()),
+          );
+        }
       }
     });
   }
 
   @override
   void dispose() {
-    _fadeController.dispose();
-    _pulseController.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -65,48 +72,38 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
           Center(
             child: FadeTransition(
               opacity: _fadeAnimation,
-              child: ScaleTransition(
-                scale: _pulseAnimation,
-                child: Container(
-                  width: 256,
-                  height: 256,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: const Color(0xFFE3DFFF).withOpacity(0.2),
-                  ),
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 40, sigmaY: 40),
-                    child: Container(color: Colors.transparent),
-                  ),
+              child: Container(
+                width: 300,
+                height: 300,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: const Color(0xFFE3DFFF).withOpacity(0.15),
+                ),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 50, sigmaY: 50),
+                  child: Container(color: Colors.transparent),
                 ),
               ),
             ),
           ),
 
-          // Main Content
+          // Main Content (Only r.gif)
           Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                // GIF Letters Container
-                FadeTransition(
-                  opacity: _fadeAnimation,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset('assets/intro/r.gif', width: 60, height: 60, fit: BoxFit.contain),
-                      Image.asset('assets/intro/a.gif', width: 60, height: 60, fit: BoxFit.contain),
-                      Image.asset('assets/intro/t.gif', width: 60, height: 60, fit: BoxFit.contain),
-                      Image.asset('assets/intro/i.gif', width: 60, height: 60, fit: BoxFit.contain),
-                      Image.asset('assets/intro/p.gif', width: 60, height: 60, fit: BoxFit.contain),
-                    ],
-                  ),
+            child: FadeTransition(
+              opacity: _fadeAnimation,
+              child: ScaleTransition(
+                scale: _scaleAnimation,
+                child: Image.asset(
+                  'assets/intro/r.gif',
+                  width: 120,
+                  height: 120,
+                  fit: BoxFit.contain,
                 ),
-              ],
+              ),
             ),
           ),
 
-          // Bottom Loading Indicator
+          // Bottom Info
           Positioned(
             bottom: 64,
             left: 0,
@@ -115,22 +112,15 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
               opacity: _fadeAnimation,
               child: Column(
                 children: [
-                  const SizedBox(
-                    width: 6,
-                    height: 6,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      valueColor: AlwaysStoppedAnimation<Color>(Color(0xFF006A61)),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
                   Opacity(
                     opacity: 0.4,
                     child: Text(
-                      'Initializing map services',
+                      'Ratip Experience',
                       style: GoogleFonts.inter(
-                        fontSize: 11,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
                         color: const Color(0xFF787680),
+                        letterSpacing: 1.5,
                       ),
                     ),
                   ),
