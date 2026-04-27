@@ -5,7 +5,7 @@ import 'package:ratip/theme/app_theme.dart';
 import 'package:ratip/widgets/glass_container.dart';
 import 'package:ratip/widgets/glass_text_field.dart';
 import 'package:ratip/screens/signup_screen.dart';
-import 'package:ratip/screens/biometric_auth_screen.dart';
+import 'package:ratip/screens/main_map_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -23,26 +23,27 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _signIn() async {
     setState(() => _isLoading = true);
     try {
-      await Supabase.instance.client.auth.signInWithPassword(
-        email: '${_nicknameController.text.trim()}@ratip.app',
-        password: _passwordController.text.trim(),
-      );
+      final userData = await Supabase.instance.client
+          .from('profiles')
+          .select()
+          .eq('nickname', _nicknameController.text.trim())
+          .eq('password', _passwordController.text.trim())
+          .maybeSingle();
+
+      if (userData == null) {
+        throw '닉네임 또는 비밀번호가 일치하지 않습니다.';
+      }
+
       if (mounted) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => const BiometricAuthScreen()),
-        );
-      }
-    } on AuthException catch (error) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(error.message), backgroundColor: Colors.red),
+          MaterialPageRoute(builder: (context) => const MainMapScreen()),
         );
       }
     } catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Unexpected error occurred'), backgroundColor: Colors.red),
+          SnackBar(content: Text(error.toString()), backgroundColor: Colors.red),
         );
       }
     } finally {
@@ -173,21 +174,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                         const SizedBox(height: 12),
 
-                        // Biometric Quick Login
-                        TextButton.icon(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => const BiometricAuthScreen()),
-                            );
-                          },
-                          icon: const Icon(Icons.fingerprint, color: AppTheme.primaryColor),
-                          label: const Text(
-                            'Use Biometrics instead',
-                            style: TextStyle(color: AppTheme.primaryColor),
-                          ),
-                        ),
-                        const SizedBox(height: 40),
+                        const SizedBox(height: 12),
+
 
                         // Sign Up Link
                         Row(

@@ -29,32 +29,33 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
     setState(() => _isLoading = true);
     try {
-      final response = await Supabase.instance.client.auth.signUp(
-        email: '${_nicknameController.text.trim()}@ratip.app',
-        password: _passwordController.text.trim(),
-        data: {'nickname': _nicknameController.text.trim()},
-      );
+      // 1. 중복 닉네임 체크
+      final existingUser = await Supabase.instance.client
+          .from('profiles')
+          .select()
+          .eq('nickname', _nicknameController.text.trim())
+          .maybeSingle();
+
+      if (existingUser != null) {
+        throw '이미 존재하는 닉네임입니다.';
+      }
+
+      // 2. 프로필 생성
+      await Supabase.instance.client.from('profiles').insert({
+        'nickname': _nicknameController.text.trim(),
+        'password': _passwordController.text.trim(),
+      });
       
       if (mounted) {
-        if (response.user != null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('✅ 계정이 생성되었습니다! 이제 로그인해주세요.'),
-            ),
-          );
-          Navigator.pop(context); // 로그인 화면으로 돌아가기
-        }
-      }
-    } on AuthException catch (error) {
-      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(error.message), backgroundColor: Colors.red),
+          const SnackBar(content: Text('✅ 계정이 생성되었습니다! 이제 로그인해주세요.')),
         );
+        Navigator.pop(context);
       }
     } catch (error) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Unexpected error occurred'), backgroundColor: Colors.red),
+          SnackBar(content: Text(error.toString()), backgroundColor: Colors.red),
         );
       }
     } finally {

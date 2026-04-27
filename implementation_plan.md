@@ -15,15 +15,15 @@
    - 🤖 **AI**: Gemini 3 Flash
 
 ## 🔑 Phase 2: 인증 & 보안 시스템
-5. **[MEDIUM]** **[UI]** 로그인 화면 & Supabase Auth 연동
+5. **[DONE]** **[UI]** 로그인 화면 & 커스텀 profiles 테이블 연동
    - 🤖 **AI**: Claude Sonnet 4.6 (Thinking)
-6. **[MEDIUM]** **[UI]** 회원가입 화면 (닉네임, 이메일, 비번)
+6. **[DONE]** **[UI]** 회원가입 화면 (닉네임, 비밀번호)
    - 🤖 **AI**: Claude Sonnet 4.6 (Thinking)
 7. **[HARD]** **[UI]** 생체 인증(Face ID/지문) 연동 및 시스템 팝업 처리
    - 🤖 **AI**: Claude Sonnet 4.6 (Thinking)
 
 ## 🗺️ Phase 3: 지도 & 탐험 시스템
-8. **[MEDIUM]** **[UI]** 메인 지도 화면 레이아웃 & 하단 네비게이션 바
+8. **[DONE]** **[UI]** 메인 지도 화면 레이아웃 & 하단 네비게이션 바
    - 🤖 **AI**: Gemini 3 Flash
 9. **[MEDIUM]** Kakao Map SDK 연동 및 기본 설정
    - 🤖 **AI**: Gemini 3.1 Pro (High)
