@@ -28,8 +28,8 @@ echo "Step 3: Flutter Pub Get..."
 flutter pub get
 
 echo "Step 4: Flutter Build Web..."
-# 가장 인자가 적고 안전한 릴리즈 빌드
-flutter build web --release
+# 가장 인자가 적고 안전한 릴리즈 빌드 (HTML renderer 필수: 카카오맵 등 HtmlElementView 사용)
+flutter build web --release --web-renderer html
 
 # 3. 배포 폴더 정리
 cd ..
