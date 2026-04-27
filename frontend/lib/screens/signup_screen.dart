@@ -14,7 +14,7 @@ class SignUpScreen extends StatefulWidget {
 
 class _SignUpScreenState extends State<SignUpScreen> {
   final _nicknameController = TextEditingController();
-  final _emailController = TextEditingController();
+
   final _passwordController = TextEditingController();
   bool _isLoading = false;
   bool _obscurePassword = true;
@@ -30,7 +30,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     setState(() => _isLoading = true);
     try {
       final response = await Supabase.instance.client.auth.signUp(
-        email: _emailController.text.trim(),
+        email: '${_nicknameController.text.trim()}@ratip.app',
         password: _passwordController.text.trim(),
         data: {'nickname': _nicknameController.text.trim()},
       );
@@ -39,8 +39,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         if (response.user != null) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('✅ 인증 이메일이 발송되었습니다. 메일함을 확인해주세요!'),
-              backgroundColor: Color(0xFF4648D4),
+              content: Text('✅ 계정이 생성되었습니다! 이제 로그인해주세요.'),
             ),
           );
           Navigator.pop(context); // 로그인 화면으로 돌아가기
@@ -130,13 +129,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                           icon: Icons.person_outline,
                         ),
                         const SizedBox(height: 20),
-                        GlassTextField(
-                          controller: _emailController,
-                          label: 'Email address',
-                          hintText: 'name@company.com',
-                          icon: Icons.mail_outline,
-                        ),
-                        const SizedBox(height: 20),
+
                         GlassTextField(
                           controller: _passwordController,
                           label: 'Password',

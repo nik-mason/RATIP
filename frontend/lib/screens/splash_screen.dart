@@ -38,7 +38,7 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
 
     _fadeController.forward();
 
-    Future.delayed(const Duration(seconds: 3), () {
+    Future.delayed(const Duration(milliseconds: 3500), () {
       if (mounted) {
         Navigator.pushReplacement(
           context,
@@ -88,60 +88,17 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Logo Container
+                // GIF Letters Container
                 FadeTransition(
                   opacity: _fadeAnimation,
-                  child: Container(
-                    padding: const EdgeInsets.all(24),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.white,
-                      boxShadow: [
-                        BoxShadow(
-                          color: const Color(0xFF1E1B4B).withOpacity(0.06),
-                          blurRadius: 50,
-                          offset: const Offset(0, 20),
-                        ),
-                      ],
-                    ),
-                    child: ClipOval(
-                      child: Image.asset(
-                        'assets/images/logo.png',
-                        width: 80,
-                        height: 80,
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 24),
-                // Brand Name
-                FadeTransition(
-                  opacity: _fadeAnimation,
-                  child: Column(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        'Ratip',
-                        style: GoogleFonts.inter(
-                          fontSize: 40,
-                          fontWeight: FontWeight.w700,
-                          color: const Color(0xFF070235),
-                          letterSpacing: -0.8,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Opacity(
-                        opacity: 0.6,
-                        child: Text(
-                          'PRECISION JOURNEY',
-                          style: GoogleFonts.inter(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: const Color(0xFF47464F),
-                            letterSpacing: 2.0,
-                          ),
-                        ),
-                      ),
+                      Image.asset('assets/intro/r.gif', width: 60, height: 60, fit: BoxFit.contain),
+                      Image.asset('assets/intro/a.gif', width: 60, height: 60, fit: BoxFit.contain),
+                      Image.asset('assets/intro/t.gif', width: 60, height: 60, fit: BoxFit.contain),
+                      Image.asset('assets/intro/i.gif', width: 60, height: 60, fit: BoxFit.contain),
+                      Image.asset('assets/intro/p.gif', width: 60, height: 60, fit: BoxFit.contain),
                     ],
                   ),
                 ),

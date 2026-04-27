@@ -15,7 +15,7 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final _emailController = TextEditingController();
+  final _nicknameController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _isLoading = false;
   bool _obscurePassword = true;
@@ -24,7 +24,7 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _isLoading = true);
     try {
       await Supabase.instance.client.auth.signInWithPassword(
-        email: _emailController.text.trim(),
+        email: '${_nicknameController.text.trim()}@ratip.app',
         password: _passwordController.text.trim(),
       );
       if (mounted) {
@@ -114,10 +114,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
                         // Form
                         GlassTextField(
-                          controller: _emailController,
-                          label: 'Email address',
-                          hintText: 'name@company.com',
-                          icon: Icons.mail_outline,
+                          controller: _nicknameController,
+                          label: 'Nickname',
+                          hintText: 'Enter your nickname',
+                          icon: Icons.person_outline,
                         ),
                         const SizedBox(height: 20),
                         GlassTextField(
