@@ -29,7 +29,8 @@ class _MainMapScreenState extends State<MainMapScreen> {
       final div = html.DivElement()
         ..style.width = '100%'
         ..style.height = '100%'
-        ..style.position = 'relative';
+        ..style.position = 'relative'
+        ..style.backgroundColor = '#F8F9FF'; // 지도 로딩 전 배경색
 
       // 지연 실행: div가 DOM에 붙은 후 카카오맵 초기화
       Future.delayed(const Duration(milliseconds: 500), () {
@@ -41,20 +42,25 @@ class _MainMapScreenState extends State<MainMapScreen> {
           }
 
           final maps = kakao['maps'];
-          final latLng = js.JsObject(
-            maps['LatLng'] as js.JsFunction,
-            [37.5665, 126.9780],
-          );
-          final options = js.JsObject.jsify({
-            'center': latLng,
-            'level': 3,
-          });
+          
+          // autoload=false 대응: maps.load() 호출 후 지도 생성
+          maps.callMethod('load', [js.allowInterop(() {
+            final latLng = js.JsObject(
+              maps['LatLng'] as js.JsFunction,
+              [37.5665, 126.9780],
+            );
+            final options = js.JsObject.jsify({
+              'center': latLng,
+              'level': 3,
+            });
 
-          // div 요소를 직접 전달
-          js.JsObject(
-            maps['Map'] as js.JsFunction,
-            [div, options],
-          );
+            // div 요소를 직접 전달하여 지도 생성
+            js.JsObject(
+              maps['Map'] as js.JsFunction,
+              [div, options],
+            );
+          })]);
+
         } catch (e) {
           div.text = '지도 로드 실패: $e';
         }
