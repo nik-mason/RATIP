@@ -7,18 +7,18 @@
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
   <meta name="description" content="Ratip: Precision Journey">
 
-  <!-- iOS meta tags & icons -->
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black">
-  <meta name="apple-mobile-web-app-title" content="ratip">
-  <link rel="apple-touch-icon" href="icons/Icon-192.png">
-
-  <!-- Favicon -->
-  <link rel="icon" type="image/png" href="favicon.png"/>
-
-  <title>ratip</title>
-  <link rel="manifest" href="manifest.json" crossorigin="use-credentials">
+  <!-- Kakao Map SDK -->
+  <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=3862fe77936849cf63911211b069af51&autoload=false"></script>
+  <script>
+    console.log("Attempting to load Kakao SDK...");
+    function checkKakao() {
+      if (window.kakao && window.kakao.maps) {
+        console.log("Kakao SDK confirmed in window");
+        return true;
+      }
+      return false;
+    }
+  </script>
 
   <style>
     body {
@@ -54,10 +54,6 @@
     }
   </style>
   
-  <!-- Kakao Map SDK -->
-  <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=3862fe77936849cf63911211b069af51&libraries=services,clusterer,drawing&autoload=false"></script>
-  
-  <!-- flutter.js를 수동으로 로드 -->
   <script src="flutter.js" defer></script>
 </head>
 <body>
@@ -68,19 +64,6 @@
 
   <script>
     window.addEventListener('load', function(ev) {
-      // 빌드 도구가 설정을 주입하지 못할 경우를 대비해 수동으로 설정
-      if (!window._flutter) {
-        window._flutter = {};
-      }
-      if (!window._flutter.buildConfig) {
-        window._flutter.buildConfig = {
-          "engineRevision": "36335019a8eab588c3c2ea783c618d90505be233",
-          "buildNumber": "1.0.0",
-          "mainDartFile": "main.dart"
-        };
-      }
-
-      // Flutter 초기화 시작
       _flutter.loader.loadEntrypoint({
         serviceWorker: {
           serviceWorkerVersion: '{{flutter_service_worker_version}}',

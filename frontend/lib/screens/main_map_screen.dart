@@ -30,44 +30,52 @@ class _MainMapScreenState extends State<MainMapScreen> {
         ..style.width = '100%'
         ..style.height = '100%'
         ..style.position = 'relative'
-        ..style.backgroundColor = '#F8F9FF'; // 지도 로딩 전 배경색
+        ..style.backgroundColor = '#F8F9FF';
 
-      // 지연 실행: div가 DOM에 붙은 후 카카오맵 초기화
-      Future.delayed(const Duration(milliseconds: 500), () {
-        try {
-          final kakao = js.context['kakao'];
-          if (kakao == null) {
-            div.text = 'Kakao SDK가 로드되지 않았습니다.';
-            return;
-          }
-
-          final maps = kakao['maps'];
-          
-          // autoload=false 대응: maps.load() 호출 후 지도 생성
-          maps.callMethod('load', [js.allowInterop(() {
-            final latLng = js.JsObject(
-              maps['LatLng'] as js.JsFunction,
-              [37.5665, 126.9780],
-            );
-            final options = js.JsObject.jsify({
-              'center': latLng,
-              'level': 3,
-            });
-
-            // div 요소를 직접 전달하여 지도 생성
-            js.JsObject(
-              maps['Map'] as js.JsFunction,
-              [div, options],
-            );
-          })]);
-
-        } catch (e) {
-          div.text = '지도 로드 실패: $e';
-        }
-      });
+      _initializeMapWithRetry(div);
 
       return div;
     });
+  }
+
+  // SDK가 로드될 때까지 재시도하는 로직
+  Future<void> _initializeMapWithRetry(html.DivElement div, {int retryCount = 0}) async {
+    if (retryCount > 10) {
+      div.text = 'Kakao SDK 로드 실패 (최대 재시도 초과). 개발자 콘솔의 도메인 설정을 확인해주세요.';
+      return;
+    }
+
+    try {
+      final kakao = js.context['kakao'];
+      if (kakao != null && kakao['maps'] != null) {
+        final maps = kakao['maps'];
+        
+        maps.callMethod('load', [js.allowInterop(() {
+          final latLng = js.JsObject(
+            maps['LatLng'] as js.JsFunction,
+            [37.5665, 126.9780],
+          );
+          final options = js.JsObject.jsify({
+            'center': latLng,
+            'level': 3,
+          });
+
+          js.JsObject(
+            maps['Map'] as js.JsFunction,
+            [div, options],
+          );
+        })]);
+      } else {
+        // 아직 로드되지 않았으면 500ms 후 재시도
+        print('Kakao SDK not ready yet, retrying... ($retryCount)');
+        await Future.delayed(const Duration(milliseconds: 500));
+        return _initializeMapWithRetry(div, retryCount: retryCount + 1);
+      }
+    } catch (e) {
+      print('Map init error: $e');
+      await Future.delayed(const Duration(milliseconds: 500));
+      return _initializeMapWithRetry(div, retryCount: retryCount + 1);
+    }
   }
 
   Widget _buildBody() {
@@ -96,10 +104,7 @@ class _MainMapScreenState extends State<MainMapScreen> {
     return Scaffold(
       body: Stack(
         children: [
-          // Main Content (Map or other screens)
           _buildBody(),
-
-          // Custom Bottom Navigation Bar
           Positioned(
             bottom: 24,
             left: 24,
