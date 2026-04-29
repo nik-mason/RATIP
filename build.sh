@@ -29,8 +29,8 @@ flutter clean
 flutter pub get
 
 echo "Step 4: Flutter Build Web..."
-# 가장 인자가 적고 안전한 릴리즈 빌드 (이전 오류 해결을 위해 렌더러 옵션 제거)
-flutter build web --release
+# HTML renderer 필수: 카카오맵 등 HtmlElementView 사용을 위해 다시 활성화
+flutter build web --release --web-renderer html
 
 # 3. 배포 폴더 정리
 cd ..
