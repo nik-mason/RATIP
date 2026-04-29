@@ -24,12 +24,13 @@ if [ ! -f "assets/.env" ]; then
   echo "KAKAO_MAP_APP_KEY=\"$KAKAO_MAP_APP_KEY\"" >> assets/.env
 fi
 
-echo "Step 3: Flutter Pub Get..."
+echo "Step 3: Flutter Clean & Pub Get..."
+flutter clean
 flutter pub get
 
 echo "Step 4: Flutter Build Web..."
-# 가장 인자가 적고 안전한 릴리즈 빌드 (HTML renderer 필수: 카카오맵 등 HtmlElementView 사용)
-flutter build web --release --web-renderer html
+# 가장 인자가 적고 안전한 릴리즈 빌드 (이전 오류 해결을 위해 렌더러 옵션 제거)
+flutter build web --release
 
 # 3. 배포 폴더 정리
 cd ..
