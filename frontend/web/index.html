@@ -17,37 +17,51 @@
       padding: 0;
       overflow: hidden;
     }
+    #loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      font-family: sans-serif;
+      color: #5F6368;
+      transition: opacity 0.5s;
+    }
   </style>
-  
-  <!-- Kakao Map SDK (Web JavaScript Key) -->
+
+  <!-- Kakao Map SDK -->
   <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=3862fe77936849cf63911211b069af51&autoload=false"></script>
 
-  <script src="flutter.js" defer></script>
+  <!-- This script adds the bootstrap script tag dynamically -->
+  <script src="flutter_bootstrap.js" async></script>
 </head>
 <body>
-  <div id="loading" style="display: flex; justify-content: center; align-items: center; height: 100vh; font-family: sans-serif; color: #5F6368;">
+  <div id="loading">
     <div style="text-align: center;">
-      <div style="margin-bottom: 16px; font-size: 24px;">Ratip</div>
-      <div>Loading...</div>
+      <div style="margin-bottom: 16px; font-size: 24px; font-weight: bold;">Ratip</div>
+      <div id="status">Loading engine...</div>
     </div>
   </div>
+
   <script>
-    console.log("[Ratip] Window load event triggered");
-    window.addEventListener('load', function(ev) {
-      console.log("[Ratip] Initializing Flutter loader...");
-      _flutter.loader.load({
-        onEntrypointLoaded: function(engineInitializer) {
-          console.log("[Ratip] Entrypoint loaded, initializing engine...");
-          engineInitializer.initializeEngine().then(function(appRunner) {
-            console.log("[Ratip] Engine initialized, running app...");
-            // Remove loading indicator when app starts
-            var loading = document.getElementById('loading');
-            if (loading) loading.remove();
-            appRunner.runApp();
-          });
-        }
-      });
+    // Listen for the first frame to hide the loading screen
+    // Note: In some versions, you might need to trigger this from Dart side.
+    // We'll also add a fallback timeout.
+    window.addEventListener('flutter-first-frame', function() {
+      console.log("[Ratip] First frame rendered, hiding loading screen.");
+      var loading = document.getElementById('loading');
+      if (loading) {
+        loading.style.opacity = '0';
+        setTimeout(function() { loading.remove(); }, 500);
+      }
     });
+
+    // Fallback: If it takes too long, just check if flutter is running
+    setTimeout(function() {
+      var loading = document.getElementById('loading');
+      if (loading) {
+        document.getElementById('status').innerText = "Initializing...";
+      }
+    }, 5000);
   </script>
 </body>
 </html>
