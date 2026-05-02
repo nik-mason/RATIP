@@ -23,7 +23,7 @@ class _MainMapScreenState extends State<MainMapScreen> {
   }
 
   // SDK를 동적으로 로드하는 함수
-  Future<void> _loadKakaoSdk() async {
+  static Future<void> _loadKakaoSdk() async {
     if (_isSdkLoaded) return;
 
     final completer = html.ScriptElement()
@@ -55,12 +55,12 @@ class _MainMapScreenState extends State<MainMapScreen> {
     });
   }
 
-  Future<void> _startInitialization(html.DivElement div) async {
+  static Future<void> _startInitialization(html.DivElement div) async {
     await _loadKakaoSdk();
     _initializeMapWithRetry(div);
   }
 
-  Future<void> _initializeMapWithRetry(html.DivElement div, {int retryCount = 0}) async {
+  static Future<void> _initializeMapWithRetry(html.DivElement div, {int retryCount = 0}) async {
     if (retryCount > 20) {
       div.text = '지도 로딩 실패. 카카오 도메인 설정을 확인해주세요.';
       return;
@@ -88,11 +88,11 @@ class _MainMapScreenState extends State<MainMapScreen> {
         })]);
       } else {
         await Future.delayed(const Duration(milliseconds: 500));
-        return _initializeMapWithRetry(div, retryCount: retryCount + 1);
+        _initializeMapWithRetry(div, retryCount: retryCount + 1);
       }
     } catch (e) {
       await Future.delayed(const Duration(milliseconds: 500));
-      return _initializeMapWithRetry(div, retryCount: retryCount + 1);
+      _initializeMapWithRetry(div, retryCount: retryCount + 1);
     }
   }
 
