@@ -178,8 +178,9 @@ class _MainMapScreenState extends State<MainMapScreen> {
       if (_myLocationMarker == null) {
         // Use custom here.gif from web/assets
         final imageSrc = 'assets/here.gif';
-        // GIF size: making it a bit larger to be visible
-        final imageSize = js.JsObject(kakaoMaps['Size'] as js.JsFunction, [80, 80]);
+        // Original size: 1122 x 1589. Ratio is ~1:1.416
+        // Setting width 60, height 85 to preserve ratio and avoid distortion
+        final imageSize = js.JsObject(kakaoMaps['Size'] as js.JsFunction, [60, 85]);
         final markerImage = js.JsObject(kakaoMaps['MarkerImage'] as js.JsFunction, [imageSrc, imageSize]);
 
         final markerOptions = js.JsObject.jsify({
