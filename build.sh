@@ -3,10 +3,10 @@ set -e
 
 echo "--- Absolute Minimal Build ---"
 
-# 1. Flutter SDK 설치 (stable 채널 사용)
+# 1. Flutter SDK 설치 (3.24.5 사용)
 if [ ! -d "flutter" ]; then
-  echo "Step 1: Cloning Flutter stable..."
-  git clone --depth 1 --branch stable https://github.com/flutter/flutter.git
+  echo "Step 1: Cloning Flutter 3.24.5..."
+  git clone --depth 1 --branch 3.24.5 https://github.com/flutter/flutter.git
 fi
 
 export PATH="$PATH:$(pwd)/flutter/bin"
@@ -31,7 +31,7 @@ flutter pub get
 
 echo "Step 4: Flutter Build Web..."
 # HTML renderer 필수: 카카오맵 등 HtmlElementView 사용을 위해 다시 활성화
-flutter build web --release --web-renderer html
+flutter build web --release --web-renderer=html
 
 # 빌드된 index.html에서 카카오 웹 키를 환경변수로 치환
 if [ -n "$KAKAO_MAP_WEB_KEY" ]; then
