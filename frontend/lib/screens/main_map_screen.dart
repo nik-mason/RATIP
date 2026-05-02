@@ -176,15 +176,17 @@ class _MainMapScreenState extends State<MainMapScreen> {
       final latLng = js.JsObject(kakaoMaps['LatLng'] as js.JsFunction, [lat, lng]);
 
       if (_myLocationMarker == null) {
-        // Create custom marker image
-        final imageSrc = 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png';
-        final imageSize = js.JsObject(kakaoMaps['Size'] as js.JsFunction, [24, 35]);
+        // Use custom here.gif from web/assets
+        final imageSrc = 'assets/here.gif';
+        // GIF size: making it a bit larger to be visible
+        final imageSize = js.JsObject(kakaoMaps['Size'] as js.JsFunction, [80, 80]);
         final markerImage = js.JsObject(kakaoMaps['MarkerImage'] as js.JsFunction, [imageSrc, imageSize]);
 
         final markerOptions = js.JsObject.jsify({
           'position': latLng,
           'image': markerImage,
           'map': _mapInstance,
+          'zIndex': 10, // Ensure it's on top
         });
         _myLocationMarker = js.JsObject(kakaoMaps['Marker'] as js.JsFunction, [markerOptions]);
       } else {
@@ -192,6 +194,31 @@ class _MainMapScreenState extends State<MainMapScreen> {
       }
     } catch (e) {
       debugPrint('[Ratip] Marker update error: $e');
+    }
+  }
+
+  void _showSearchPulse(double lat, double lng) {
+    if (_mapInstance == null) return;
+    try {
+      final kakaoMaps = js.context['kakao']['maps'];
+      final latLng = js.JsObject(kakaoMaps['LatLng'] as js.JsFunction, [lat, lng]);
+      
+      final content = html.DivElement()..className = 'search-pulse';
+      final overlayOptions = js.JsObject.jsify({
+        'content': content,
+        'position': latLng,
+        'zIndex': 5,
+      });
+      
+      final pulseOverlay = js.JsObject(kakaoMaps['CustomOverlay'] as js.JsFunction, [overlayOptions]);
+      pulseOverlay.callMethod('setMap', [_mapInstance]);
+      
+      // Remove after 4 seconds
+      Future.delayed(const Duration(seconds: 4), () {
+        pulseOverlay.callMethod('setMap', [null]);
+      });
+    } catch (e) {
+      debugPrint('[Ratip] Pulse error: $e');
     }
   }
 
@@ -470,6 +497,7 @@ class _MainMapScreenState extends State<MainMapScreen> {
                       final lat = double.parse(selectedPlace['y']);
                       final lng = double.parse(selectedPlace['x']);
                       _moveToLocation(lat, lng);
+                      _showSearchPulse(lat, lng); // Trigger pulse effect
                       
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
