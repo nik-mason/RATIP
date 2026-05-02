@@ -25,11 +25,24 @@
   <script src="flutter.js" defer></script>
 </head>
 <body>
+  <div id="loading" style="display: flex; justify-content: center; align-items: center; height: 100vh; font-family: sans-serif; color: #5F6368;">
+    <div style="text-align: center;">
+      <div style="margin-bottom: 16px; font-size: 24px;">Ratip</div>
+      <div>Loading...</div>
+    </div>
+  </div>
   <script>
+    console.log("[Ratip] Window load event triggered");
     window.addEventListener('load', function(ev) {
+      console.log("[Ratip] Initializing Flutter loader...");
       _flutter.loader.load({
         onEntrypointLoaded: function(engineInitializer) {
+          console.log("[Ratip] Entrypoint loaded, initializing engine...");
           engineInitializer.initializeEngine().then(function(appRunner) {
+            console.log("[Ratip] Engine initialized, running app...");
+            // Remove loading indicator when app starts
+            var loading = document.getElementById('loading');
+            if (loading) loading.remove();
             appRunner.runApp();
           });
         }
