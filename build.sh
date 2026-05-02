@@ -22,6 +22,7 @@ if [ ! -f "assets/.env" ]; then
   echo "SUPABASE_URL=\"$SUPABASE_URL\"" > assets/.env
   echo "SUPABASE_ANON_KEY=\"$SUPABASE_ANON_KEY\"" >> assets/.env
   echo "KAKAO_MAP_APP_KEY=\"$KAKAO_MAP_APP_KEY\"" >> assets/.env
+  echo "KAKAO_MAP_WEB_KEY=\"$KAKAO_MAP_WEB_KEY\"" >> assets/.env
 fi
 
 echo "Step 3: Flutter Clean & Pub Get..."
@@ -31,6 +32,12 @@ flutter pub get
 echo "Step 4: Flutter Build Web..."
 # HTML renderer 필수: 카카오맵 등 HtmlElementView 사용을 위해 다시 활성화
 flutter build web --release --web-renderer html
+
+# 빌드된 index.html에서 카카오 웹 키를 환경변수로 치환
+if [ -n "$KAKAO_MAP_WEB_KEY" ]; then
+  echo "Step 4.5: Injecting KAKAO_MAP_WEB_KEY into index.html..."
+  sed -i "s|appkey=[a-f0-9]*&autoload|appkey=$KAKAO_MAP_WEB_KEY\&autoload|g" build/web/index.html
+fi
 
 # 3. 배포 폴더 정리
 cd ..

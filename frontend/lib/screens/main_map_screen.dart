@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:ratip/theme/app_theme.dart';
 import 'dart:ui_web' as ui_web;
 import 'dart:html' as html;
@@ -25,6 +27,7 @@ class _MainMapScreenState extends State<MainMapScreen> {
   }
 
   /// Kakao Map SDK를 동적으로 한 번만 로드합니다.
+  /// 웹의 경우 index.html에서 이미 SDK가 로드되어 있으므로 재사용합니다.
   static Future<void> _loadKakaoSdk() async {
     // 이미 로드 완료
     if (_isSdkLoaded) return;
@@ -35,18 +38,49 @@ class _MainMapScreenState extends State<MainMapScreen> {
 
     _sdkCompleter = Completer<void>();
 
-    final script = html.ScriptElement()
-      ..type = 'text/javascript'
-      ..src =
-          'https://dapi.kakao.com/v2/maps/sdk.js?appkey=3862fe77936849cf63911211b069af51&autoload=false';
-
-    html.document.head!.append(script);
-
     try {
-      await script.onLoad.first;
-      _isSdkLoaded = true;
-      _sdkCompleter!.complete();
-      debugPrint('[Ratip] Kakao Map SDK loaded.');
+      if (kIsWeb) {
+        // 웹: index.html에서 이미 SDK 스크립트가 로드됨 (웹 JavaScript 키 사용)
+        // kakao 객체가 존재하는지 확인
+        final kakaoExists = js.context.hasProperty('kakao');
+        if (kakaoExists) {
+          _isSdkLoaded = true;
+          _sdkCompleter!.complete();
+          debugPrint('[Ratip] Kakao Map SDK already loaded from index.html (Web key).');
+          return;
+        }
+        // 만약 아직 로드 안 됐으면 (네트워크 지연 등) 잠시 대기 후 재확인
+        for (int i = 0; i < 20; i++) {
+          await Future.delayed(const Duration(milliseconds: 250));
+          if (js.context.hasProperty('kakao')) {
+            _isSdkLoaded = true;
+            _sdkCompleter!.complete();
+            debugPrint('[Ratip] Kakao Map SDK loaded from index.html after wait.');
+            return;
+          }
+        }
+        // 5초 대기 후에도 없으면 에러
+        throw Exception('Kakao SDK not found after 5s. Check index.html script tag.');
+      } else {
+        // 앱(Android/iOS): 동적으로 스크립트 삽입 (앱 키 사용)
+        final kakaoKey = dotenv.env['KAKAO_MAP_APP_KEY'] ?? '';
+        if (kakaoKey.isEmpty) {
+          debugPrint('[Ratip] Warning: KAKAO_MAP_APP_KEY is empty!');
+        } else {
+          debugPrint('[Ratip] Using Kakao App key: $kakaoKey');
+        }
+
+        final script = html.ScriptElement()
+          ..type = 'text/javascript'
+          ..src =
+              'https://dapi.kakao.com/v2/maps/sdk.js?appkey=$kakaoKey&autoload=false';
+
+        html.document.head!.append(script);
+        await script.onLoad.first;
+        _isSdkLoaded = true;
+        _sdkCompleter!.complete();
+        debugPrint('[Ratip] Kakao Map SDK loaded dynamically (App key).');
+      }
     } catch (e) {
       _sdkCompleter!.completeError(e);
       rethrow;
