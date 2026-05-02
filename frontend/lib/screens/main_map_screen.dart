@@ -253,7 +253,7 @@ class _MainMapScreenState extends State<MainMapScreen> {
 
       final script = html.ScriptElement()
         ..type = 'text/javascript'
-        ..src = 'https://dapi.kakao.com/v2/maps/sdk.js?appkey=$kakaoKey&autoload=false';
+        ..src = 'https://dapi.kakao.com/v2/maps/sdk.js?appkey=$kakaoKey&autoload=false&libraries=services';
 
       script.onError.listen((event) {
         debugPrint('[Ratip] ❌ SDK 스크립트 로드 네트워크 에러: $event');
@@ -465,11 +465,21 @@ class _MainMapScreenState extends State<MainMapScreen> {
                   context,
                   MaterialPageRoute(builder: (context) => const PlaceSearchScreen()),
                 ).then((selectedPlace) {
-                  if (selectedPlace != null) {
-                    // Handle search result selection
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('$selectedPlace(으)로 이동합니다.')),
-                    );
+                  if (selectedPlace != null && selectedPlace is Map<String, dynamic>) {
+                    try {
+                      final lat = double.parse(selectedPlace['y']);
+                      final lng = double.parse(selectedPlace['x']);
+                      _moveToLocation(lat, lng);
+                      
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('${selectedPlace['place_name']}(으)로 이동합니다.'),
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
+                    } catch (e) {
+                      debugPrint('[Ratip] Parse coordinates error: $e');
+                    }
                   }
                 });
               },
