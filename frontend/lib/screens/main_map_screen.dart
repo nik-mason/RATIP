@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:ui';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -15,7 +16,6 @@ class MainMapScreen extends StatefulWidget {
 }
 
 class _MainMapScreenState extends State<MainMapScreen> {
-  int _selectedIndex = 0;
   static bool _isViewFactoryRegistered = false;
   static bool _isSdkLoaded = false;
   static Completer<void>? _sdkCompleter;
@@ -26,13 +26,11 @@ class _MainMapScreenState extends State<MainMapScreen> {
     _registerMapViewFactory();
   }
 
-  /// Kakao Map SDK를 로드합니다.
-  /// 웹: index.html에서 이미 로드된 SDK를 감지하거나, 없으면 동적으로 로드합니다.
+  // ─── SDK Loading ───────────────────────────────────────────────
+
   static Future<void> _loadKakaoSdk() async {
     if (_isSdkLoaded) return;
-    if (_sdkCompleter != null) {
-      return _sdkCompleter!.future;
-    }
+    if (_sdkCompleter != null) return _sdkCompleter!.future;
 
     _sdkCompleter = Completer<void>();
 
@@ -49,7 +47,7 @@ class _MainMapScreenState extends State<MainMapScreen> {
 
       debugPrint('[Ratip] kakao 객체 아직 없음. 잠시 대기...');
 
-      // Step 2: 네트워크 지연 등으로 아직 로드 안 된 경우 대기 (최대 3초)
+      // Step 2: 대기 (최대 3초)
       for (int i = 0; i < 12; i++) {
         await Future.delayed(const Duration(milliseconds: 250));
         if (js.context.hasProperty('kakao')) {
@@ -62,7 +60,7 @@ class _MainMapScreenState extends State<MainMapScreen> {
 
       debugPrint('[Ratip] index.html에서 SDK 로드 실패. 동적 로드 시도...');
 
-      // Step 3: index.html에서 못 찾았으면 동적으로 스크립트 삽입 (fallback)
+      // Step 3: 동적 로드 fallback
       final kakaoKey = kIsWeb
           ? (dotenv.env['KAKAO_MAP_WEB_KEY'] ?? '')
           : (dotenv.env['KAKAO_MAP_APP_KEY'] ?? '');
@@ -90,7 +88,6 @@ class _MainMapScreenState extends State<MainMapScreen> {
         },
       );
 
-      // 로드 후 kakao 객체 존재 확인
       if (!js.context.hasProperty('kakao')) {
         throw Exception('스크립트 로드됐으나 kakao 객체가 없음. API 키를 확인해주세요.');
       }
@@ -105,7 +102,8 @@ class _MainMapScreenState extends State<MainMapScreen> {
     }
   }
 
-  /// HtmlElementView 뷰 팩토리를 단 한 번만 등록합니다.
+  // ─── View Factory ──────────────────────────────────────────────
+
   void _registerMapViewFactory() {
     if (_isViewFactoryRegistered) return;
     _isViewFactoryRegistered = true;
@@ -119,17 +117,16 @@ class _MainMapScreenState extends State<MainMapScreen> {
           ..style.height = '100%'
           ..style.position = 'absolute'
           ..style.top = '0'
-          ..style.left = '0'
-          ..style.backgroundColor = '#F8F9FF';
+          ..style.left = '0';
 
-        // 비동기로 SDK 로드 후 지도 초기화
         _initMap(container);
         return container;
       },
     );
   }
 
-  /// SDK 로드 완료 후 kakao.maps.load() 콜백 안에서 Map 객체를 생성합니다.
+  // ─── Map Initialization ────────────────────────────────────────
+
   static Future<void> _initMap(html.DivElement container) async {
     try {
       await _loadKakaoSdk();
@@ -166,10 +163,7 @@ class _MainMapScreenState extends State<MainMapScreen> {
     }
   }
 
-  /// DOM API로 에러 메시지를 표시합니다.
-  /// innerHtml 대신 createElement를 사용하여 sanitizer 문제를 회피합니다.
   static void _showError(html.DivElement container, String message) {
-    // 기존 내용 제거
     container.children.clear();
 
     final wrapper = html.DivElement()
@@ -178,11 +172,12 @@ class _MainMapScreenState extends State<MainMapScreen> {
       ..style.alignItems = 'center'
       ..style.justifyContent = 'center'
       ..style.height = '100%'
-      ..style.fontFamily = 'sans-serif'
+      ..style.fontFamily = 'Inter, sans-serif'
       ..style.fontSize = '14px'
       ..style.color = '#464554'
       ..style.textAlign = 'center'
-      ..style.padding = '24px';
+      ..style.padding = '24px'
+      ..style.backgroundColor = '#F8F9FF';
 
     final icon = html.SpanElement()
       ..text = '🗺️'
@@ -199,91 +194,280 @@ class _MainMapScreenState extends State<MainMapScreen> {
     container.append(wrapper);
   }
 
-  Widget _buildBody() {
-    switch (_selectedIndex) {
-      case 0:
-        return const HtmlElementView(viewType: 'kakao-map-view');
-      case 1:
-        return const Center(child: Text('Search'));
-      case 2:
-        return const Center(child: Text('Reviews'));
-      case 3:
-        return const Center(child: Text('Profile'));
-      default:
-        return const SizedBox.shrink();
-    }
-  }
-
-  void _onItemTapped(int index) {
-    setState(() => _selectedIndex = index);
-  }
+  // ─── UI Build ──────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
+    final topPadding = MediaQuery.of(context).padding.top;
+
     return Scaffold(
       body: Stack(
-        fit: StackFit.expand, // Stack이 화면 전체를 차지
+        fit: StackFit.expand,
         children: [
-          // 지도(또는 다른 탭 콘텐츠)가 전체를 꽉 채우도록
-          Positioned.fill(
-            child: _buildBody(),
+          // ── 1) Full-screen Kakao Map
+          const Positioned.fill(
+            child: HtmlElementView(viewType: 'kakao-map-view'),
           ),
 
-          // 플로팅 하단 네비게이션 바
+          // ── 2) Top Search Bar (Google Maps style)
           Positioned(
+            top: topPadding + 12,
+            left: 16,
+            right: 16,
+            child: _buildSearchBar(),
+          ),
+
+          // ── 3) Left sidebar nav icons
+          Positioned(
+            left: 16,
+            top: topPadding + 80,
+            child: _buildSideNav(),
+          ),
+
+          // ── 4) Right-side controls (zoom, my location)
+          Positioned(
+            right: 16,
+            bottom: 100,
+            child: _buildMapControls(),
+          ),
+
+          // ── 5) Bottom-left "Layers" chip
+          Positioned(
+            left: 16,
             bottom: 24,
-            left: 24,
-            right: 24,
-            child: Container(
-              height: 72,
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.9),
-                borderRadius: BorderRadius.circular(30),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 20,
-                    offset: const Offset(0, 10),
-                  ),
-                ],
+            child: _buildLayersChip(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Google Maps style floating search bar
+  Widget _buildSearchBar() {
+    return Container(
+      height: 52,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(28),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+          BoxShadow(
+            color: Colors.black.withOpacity(0.04),
+            blurRadius: 4,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          // Hamburger menu
+          Material(
+            color: Colors.transparent,
+            borderRadius: BorderRadius.circular(28),
+            child: InkWell(
+              borderRadius: BorderRadius.circular(28),
+              onTap: () {},
+              child: const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                child: Icon(Icons.menu, color: Color(0xFF5F6368), size: 24),
               ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(30),
-                child: BottomNavigationBar(
-                  items: const <BottomNavigationBarItem>[
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.map_outlined),
-                      label: 'Map',
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.search_outlined),
-                      label: 'Search',
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.rate_review_outlined),
-                      label: 'Reviews',
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.person_outline),
-                      label: 'Profile',
-                    ),
-                  ],
-                  currentIndex: _selectedIndex,
-                  selectedItemColor: AppTheme.primaryColor,
-                  unselectedItemColor: AppTheme.outline,
-                  onTap: _onItemTapped,
-                  type: BottomNavigationBarType.fixed,
-                  backgroundColor: Colors.transparent,
-                  elevation: 0,
-                  showSelectedLabels: false,
-                  showUnselectedLabels: false,
+            ),
+          ),
+          // Search text
+          Expanded(
+            child: GestureDetector(
+              onTap: () {
+                // TODO: navigate to search screen
+              },
+              child: Text(
+                'Ratip 에서 검색',
+                style: TextStyle(
+                  color: const Color(0xFF5F6368),
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                  letterSpacing: 0.2,
                 ),
               ),
+            ),
+          ),
+          // Profile avatar
+          Padding(
+            padding: const EdgeInsets.only(right: 8),
+            child: CircleAvatar(
+              radius: 18,
+              backgroundColor: AppTheme.primaryColor,
+              child: const Icon(Icons.person, color: Colors.white, size: 20),
             ),
           ),
         ],
       ),
     );
   }
-}
 
+  /// Left sidebar navigation (Google Maps style vertical icons)
+  Widget _buildSideNav() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.08),
+            blurRadius: 12,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 4),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _sideNavItem(Icons.bookmark_outline, 'Saved', false),
+          _sideNavItem(Icons.history, 'Recents', false),
+          _sideNavItem(Icons.star_outline, 'Reviews', false),
+        ],
+      ),
+    );
+  }
+
+  Widget _sideNavItem(IconData icon, String label, bool isActive) {
+    return Tooltip(
+      message: label,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: () {},
+          child: Container(
+            width: 44,
+            height: 44,
+            alignment: Alignment.center,
+            child: Icon(
+              icon,
+              size: 22,
+              color: isActive
+                  ? AppTheme.primaryColor
+                  : const Color(0xFF5F6368),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// Right-side map controls (zoom + my location)
+  Widget _buildMapControls() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // My Location button
+        _controlButton(
+          icon: Icons.my_location,
+          onTap: () {
+            // TODO: move to current location
+          },
+        ),
+        const SizedBox(height: 12),
+        // Zoom controls
+        Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.08),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _zoomButton(Icons.add, () {}),
+              Container(
+                width: 28,
+                height: 1,
+                color: const Color(0xFFE0E0E0),
+              ),
+              _zoomButton(Icons.remove, () {}),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _controlButton({
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(24),
+      elevation: 2,
+      shadowColor: Colors.black.withOpacity(0.15),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(24),
+        onTap: onTap,
+        child: Container(
+          width: 44,
+          height: 44,
+          alignment: Alignment.center,
+          child: Icon(icon, size: 22, color: const Color(0xFF5F6368)),
+        ),
+      ),
+    );
+  }
+
+  Widget _zoomButton(IconData icon, VoidCallback onTap) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(12),
+      onTap: onTap,
+      child: Container(
+        width: 44,
+        height: 40,
+        alignment: Alignment.center,
+        child: Icon(icon, size: 20, color: const Color(0xFF5F6368)),
+      ),
+    );
+  }
+
+  /// Bottom-left "Layers" chip (like Google Maps)
+  Widget _buildLayersChip() {
+    return Material(
+      color: Colors.white,
+      borderRadius: BorderRadius.circular(24),
+      elevation: 2,
+      shadowColor: Colors.black.withOpacity(0.15),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(24),
+        onTap: () {
+          // TODO: show map type selector
+        },
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(Icons.layers_outlined, size: 20, color: const Color(0xFF5F6368)),
+              const SizedBox(width: 6),
+              Text(
+                '레이어',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: const Color(0xFF3C4043),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
