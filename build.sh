@@ -3,10 +3,10 @@ set -e
 
 echo "--- Absolute Minimal Build ---"
 
-# 1. Flutter SDK 설치 (특정 버전 태그로 고정)
+# 1. Flutter SDK 설치 (stable 채널 사용)
 if [ ! -d "flutter" ]; then
-  echo "Step 1: Cloning Flutter 3.24.3..."
-  git clone --depth 1 --branch 3.24.3 https://github.com/flutter/flutter.git
+  echo "Step 1: Cloning Flutter stable..."
+  git clone --depth 1 --branch stable https://github.com/flutter/flutter.git
 fi
 
 export PATH="$PATH:$(pwd)/flutter/bin"
