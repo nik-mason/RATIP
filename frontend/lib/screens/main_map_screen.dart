@@ -234,6 +234,28 @@ class _MainMapScreenState extends State<MainMapScreen> {
     }
   }
 
+  void _zoomIn() {
+    if (_mapInstance == null) return;
+    try {
+      final int level = _mapInstance!.callMethod('getLevel');
+      if (level > 1) {
+        _mapInstance!.callMethod('setLevel', [level - 1]);
+      }
+    } catch (e) {
+      debugPrint('[Ratip] Zoom in error: $e');
+    }
+  }
+
+  void _zoomOut() {
+    if (_mapInstance == null) return;
+    try {
+      final int level = _mapInstance!.callMethod('getLevel');
+      _mapInstance!.callMethod('setLevel', [level + 1]);
+    } catch (e) {
+      debugPrint('[Ratip] Zoom out error: $e');
+    }
+  }
+
   // ─── SDK Loading ───────────────────────────────────────────────
 
   static Future<void> _loadKakaoSdk() async {
@@ -352,7 +374,7 @@ class _MainMapScreenState extends State<MainMapScreen> {
             );
             final options = js.JsObject.jsify({
               'center': latLng,
-              'level': 3,
+              'level': 2, // Default zoom level closer (Task: zoom in more)
             });
             _mapInstance = js.JsObject(
               js.context['kakao']['maps']['Map'] as js.JsFunction,
@@ -616,13 +638,13 @@ class _MainMapScreenState extends State<MainMapScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _zoomButton(Icons.add, () {}),
+              _zoomButton(Icons.add, _zoomIn),
               Container(
                 width: 28,
                 height: 1,
                 color: const Color(0xFFE0E0E0),
               ),
-              _zoomButton(Icons.remove, () {}),
+              _zoomButton(Icons.remove, _zoomOut),
             ],
           ),
         ),
