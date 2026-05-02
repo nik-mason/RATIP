@@ -7,6 +7,8 @@ import 'package:ratip/theme/app_theme.dart';
 import 'dart:ui_web' as ui_web;
 import 'dart:html' as html;
 import 'dart:js' as js;
+import 'package:geolocator/geolocator.dart';
+import 'package:ratip/screens/place_search_screen.dart';
 
 class MainMapScreen extends StatefulWidget {
   const MainMapScreen({super.key});
@@ -20,10 +22,151 @@ class _MainMapScreenState extends State<MainMapScreen> {
   static bool _isSdkLoaded = false;
   static Completer<void>? _sdkCompleter;
 
+  static js.JsObject? _mapInstance;
+  static js.JsObject? _myLocationMarker;
+  StreamSubscription<Position>? _positionStream;
+
   @override
   void initState() {
     super.initState();
     _registerMapViewFactory();
+    // Delay permission check slightly to ensure UI is ready
+    Future.delayed(const Duration(milliseconds: 500), () {
+      if (mounted) {
+        _checkLocationPermissionAndTrack();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _positionStream?.cancel();
+    super.dispose();
+  }
+
+  // ─── Location & Permission ──────────────────────────────────────
+
+  Future<void> _checkLocationPermissionAndTrack() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      _showPermissionDialog('위치 서비스가 비활성화되어 있습니다. 설정에서 켜주세요.');
+      return;
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      // 권한 요청 안내 팝업 (Task 11)
+      final bool? shouldRequest = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          title: const Text('GPS 권한 요청', style: TextStyle(fontWeight: FontWeight.bold)),
+          content: const Text('현재 위치를 확인하고 주변 리뷰를 탐색하기 위해 위치 권한이 필요합니다.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text('취소', style: TextStyle(color: Colors.grey)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppTheme.primaryColor,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              onPressed: () => Navigator.pop(context, true),
+              child: const Text('권한 허용', style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        ),
+      );
+
+      if (shouldRequest != true) return;
+
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      _showPermissionDialog('위치 권한이 영구적으로 거부되었습니다. 설정에서 허용해주세요.');
+      return;
+    }
+
+    // Permission granted, start tracking (Task 10)
+    _startLocationTracking();
+  }
+
+  void _showPermissionDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        content: Text(message),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('확인', style: TextStyle(color: AppTheme.primaryColor)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _startLocationTracking() {
+    _positionStream?.cancel();
+    _positionStream = Geolocator.getPositionStream(
+      locationSettings: const LocationSettings(
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 10,
+      ),
+    ).listen((Position position) {
+      _updateMyLocationMarker(position.latitude, position.longitude);
+    });
+
+    // Get current position immediately and move map
+    Geolocator.getCurrentPosition().then((pos) {
+      _moveToLocation(pos.latitude, pos.longitude);
+    });
+  }
+
+  void _updateMyLocationMarker(double lat, double lng) {
+    if (_mapInstance == null) return;
+    try {
+      final kakaoMaps = js.context['kakao']['maps'];
+      final latLng = js.JsObject(kakaoMaps['LatLng'] as js.JsFunction, [lat, lng]);
+
+      if (_myLocationMarker == null) {
+        // Create custom marker image
+        final imageSrc = 'https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png';
+        final imageSize = js.JsObject(kakaoMaps['Size'] as js.JsFunction, [24, 35]);
+        final markerImage = js.JsObject(kakaoMaps['MarkerImage'] as js.JsFunction, [imageSrc, imageSize]);
+
+        final markerOptions = js.JsObject.jsify({
+          'position': latLng,
+          'image': markerImage,
+          'map': _mapInstance,
+        });
+        _myLocationMarker = js.JsObject(kakaoMaps['Marker'] as js.JsFunction, [markerOptions]);
+      } else {
+        _myLocationMarker!.callMethod('setPosition', [latLng]);
+      }
+    } catch (e) {
+      debugPrint('[Ratip] Marker update error: $e');
+    }
+  }
+
+  void _moveToLocation(double lat, double lng) {
+    if (_mapInstance == null) return;
+    try {
+      final kakaoMaps = js.context['kakao']['maps'];
+      final latLng = js.JsObject(kakaoMaps['LatLng'] as js.JsFunction, [lat, lng]);
+      _mapInstance!.callMethod('panTo', [latLng]);
+    } catch (e) {
+      debugPrint('[Ratip] Move map error: $e');
+    }
   }
 
   // ─── SDK Loading ───────────────────────────────────────────────
@@ -146,7 +289,7 @@ class _MainMapScreenState extends State<MainMapScreen> {
               'center': latLng,
               'level': 3,
             });
-            js.JsObject(
+            _mapInstance = js.JsObject(
               js.context['kakao']['maps']['Map'] as js.JsFunction,
               [container, options],
             );
@@ -281,7 +424,17 @@ class _MainMapScreenState extends State<MainMapScreen> {
           Expanded(
             child: GestureDetector(
               onTap: () {
-                // TODO: navigate to search screen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const PlaceSearchScreen()),
+                ).then((selectedPlace) {
+                  if (selectedPlace != null) {
+                    // Handle search result selection
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('$selectedPlace(으)로 이동합니다.')),
+                    );
+                  }
+                });
               },
               child: Text(
                 'Ratip 에서 검색',
@@ -367,8 +520,15 @@ class _MainMapScreenState extends State<MainMapScreen> {
         // My Location button
         _controlButton(
           icon: Icons.my_location,
-          onTap: () {
-            // TODO: move to current location
+          onTap: () async {
+            try {
+              final pos = await Geolocator.getCurrentPosition(
+                desiredAccuracy: LocationAccuracy.high,
+              );
+              _moveToLocation(pos.latitude, pos.longitude);
+            } catch (e) {
+              debugPrint('[Ratip] Fetch location error: $e');
+            }
           },
         ),
         const SizedBox(height: 12),
@@ -447,7 +607,7 @@ class _MainMapScreenState extends State<MainMapScreen> {
       child: InkWell(
         borderRadius: BorderRadius.circular(24),
         onTap: () {
-          // TODO: show map type selector
+          _showMapFilterBottomSheet();
         },
         child: Container(
           padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -468,6 +628,79 @@ class _MainMapScreenState extends State<MainMapScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  void _showMapFilterBottomSheet() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (context) {
+        return Container(
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                '지도 필터 설정',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF3C4043)),
+              ),
+              const SizedBox(height: 24),
+              _filterOption('내 장소', '내가 기록한 장소만 봅니다.', true),
+              const SizedBox(height: 16),
+              _filterOption('친구 장소', '친구들이 기록한 장소도 함께 봅니다.', false),
+              const SizedBox(height: 16),
+              _filterOption('이벤트 장소', '현재 진행 중인 이벤트 장소를 표시합니다.', true),
+              const SizedBox(height: 32),
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primaryColor,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  ),
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('적용하기', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _filterOption(String title, String subtitle, bool isSelected) {
+    return StatefulBuilder(
+      builder: (context, setState) {
+        return Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500, color: Color(0xFF3C4043))),
+                  const SizedBox(height: 4),
+                  Text(subtitle, style: const TextStyle(fontSize: 13, color: Color(0xFF5F6368))),
+                ],
+              ),
+            ),
+            Switch(
+              value: isSelected,
+              onChanged: (val) {
+                setState(() {
+                  isSelected = val;
+                });
+              },
+              activeColor: AppTheme.primaryColor,
+            ),
+          ],
+        );
+      }
     );
   }
 }

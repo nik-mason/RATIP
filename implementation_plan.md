@@ -27,13 +27,13 @@
    - 🤖 **AI**: Gemini 3 Flash
 9. **[MEDIUM]** Kakao Map SDK 연동 및 기본 설정
    - 🤖 **AI**: Gemini 3.1 Pro (High)
-10. **[EASY]** 실시간 내 위치 추적 마커 구현
+10. **[DONE]** 실시간 내 위치 추적 마커 구현
     - 🤖 **AI**: Gemini 3.1 Pro (Low)
-11. **[EASY]** **[UI]** GPS 권한 요청 안내 팝업
+11. **[DONE]** **[UI]** GPS 권한 요청 안내 팝업
     - 🤖 **AI**: Gemini 3 Flash
-12. **[MEDIUM]** **[UI]** 장소 검색바 및 검색 결과 리스트 화면
+12. **[DONE]** **[UI]** 장소 검색바 및 검색 결과 리스트 화면
     - 🤖 **AI**: Claude Sonnet 4.6 (Thinking)
-13. **[EASY]** **[UI]** 지도 필터 설정 팝업 (내 장소/친구 장소 등)
+13. **[DONE]** **[UI]** 지도 필터 설정 팝업 (내 장소/친구 장소 등)
     - 🤖 **AI**: Gemini 3 Flash
 
 ## 📸 Phase 4: 리뷰 기록 시스템 (Core Loop)
