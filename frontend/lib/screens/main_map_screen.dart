@@ -126,10 +126,47 @@ class _MainMapScreenState extends State<MainMapScreen> {
       _updateMyLocationMarker(position.latitude, position.longitude);
     });
 
-    // Get current position immediately and move map
-    Geolocator.getCurrentPosition().then((pos) {
-      _moveToLocation(pos.latitude, pos.longitude);
-    });
+    // Get current position immediately and move map when map is ready
+    _moveToCurrentLocation(showFeedback: false);
+  }
+
+  Future<void> _moveToCurrentLocation({bool showFeedback = true}) async {
+    try {
+      if (showFeedback && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('현재 위치를 찾는 중...'), duration: Duration(seconds: 1)),
+        );
+      }
+
+      final pos = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      // Wait up to 5 seconds for map to be ready if it's not yet
+      int attempts = 0;
+      while (_mapInstance == null && attempts < 10) {
+        await Future.delayed(const Duration(milliseconds: 500));
+        attempts++;
+      }
+
+      if (_mapInstance != null) {
+        _moveToLocation(pos.latitude, pos.longitude);
+        _updateMyLocationMarker(pos.latitude, pos.longitude);
+      } else {
+        if (showFeedback && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('지도를 불러오는 중입니다. 잠시 후 다시 시도해주세요.')),
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint('[Ratip] _moveToCurrentLocation error: $e');
+      if (showFeedback && mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('위치를 가져오지 못했습니다: $e')),
+        );
+      }
+    }
   }
 
   void _updateMyLocationMarker(double lat, double lng) {
@@ -520,16 +557,8 @@ class _MainMapScreenState extends State<MainMapScreen> {
         // My Location button
         _controlButton(
           icon: Icons.my_location,
-          onTap: () async {
-            try {
-              final pos = await Geolocator.getCurrentPosition(
-                desiredAccuracy: LocationAccuracy.high,
-              );
-              _moveToLocation(pos.latitude, pos.longitude);
-            } catch (e) {
-              debugPrint('[Ratip] Fetch location error: $e');
-            }
-          },
+          onTap: () => _moveToCurrentLocation(),
+          isPrimary: true,
         ),
         const SizedBox(height: 12),
         // Zoom controls
@@ -565,20 +594,35 @@ class _MainMapScreenState extends State<MainMapScreen> {
   Widget _controlButton({
     required IconData icon,
     required VoidCallback onTap,
+    bool isPrimary = false,
   }) {
-    return Material(
-      color: Colors.white,
-      borderRadius: BorderRadius.circular(24),
-      elevation: 2,
-      shadowColor: Colors.black.withOpacity(0.15),
-      child: InkWell(
-        borderRadius: BorderRadius.circular(24),
-        onTap: onTap,
-        child: Container(
-          width: 44,
-          height: 44,
-          alignment: Alignment.center,
-          child: Icon(icon, size: 22, color: const Color(0xFF5F6368)),
+    return Container(
+      decoration: BoxDecoration(
+        color: isPrimary ? AppTheme.primaryColor : Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.12),
+            blurRadius: 8,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: onTap,
+          child: Container(
+            width: 52,
+            height: 52,
+            alignment: Alignment.center,
+            child: Icon(
+              icon,
+              size: 24,
+              color: isPrimary ? Colors.white : const Color(0xFF5F6368),
+            ),
+          ),
         ),
       ),
     );
