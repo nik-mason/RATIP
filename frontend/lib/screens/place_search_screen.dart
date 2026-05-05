@@ -157,7 +157,10 @@ class _PlaceSearchScreenState extends State<PlaceSearchScreen> {
                           style: const TextStyle(fontSize: 13, color: Color(0xFF5F6368)),
                         ),
                         onTap: () {
-                          Navigator.pop(context, place);
+                          Navigator.pop(context, {
+                            'selected': place,
+                            'results': _searchResults,
+                          });
                         },
                       );
                     },

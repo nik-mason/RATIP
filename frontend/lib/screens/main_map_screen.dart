@@ -26,6 +26,9 @@ class _MainMapScreenState extends State<MainMapScreen> {
   static js.JsObject? _myLocationMarker;
   StreamSubscription<Position>? _positionStream;
 
+  static final List<js.JsObject> _searchMarkers = [];
+  static js.JsObject? _activeInfoWindow;
+
   @override
   void initState() {
     super.initState();
@@ -220,6 +223,57 @@ class _MainMapScreenState extends State<MainMapScreen> {
       });
     } catch (e) {
       debugPrint('[Ratip] Pulse error: $e');
+    }
+  }
+
+  void _addSearchResultMarker(double lat, double lng, String placeName, String address, {bool isOpen = false}) {
+    if (_mapInstance == null) return;
+    try {
+      final kakaoMaps = js.context['kakao']['maps'];
+      final latLng = js.JsObject(kakaoMaps['LatLng'] as js.JsFunction, [lat, lng]);
+
+      final markerOptions = js.JsObject.jsify({
+        'position': latLng,
+        'map': _mapInstance,
+      });
+      final marker = js.JsObject(kakaoMaps['Marker'] as js.JsFunction, [markerOptions]);
+      _searchMarkers.add(marker);
+
+      final iwContent = '''
+        <div style="padding:15px; font-family: 'Inter', sans-serif; text-align: center; min-width: 150px;">
+          <div style="font-weight: bold; font-size: 15px; margin-bottom: 4px; color: #333;">$placeName</div>
+          <div style="font-size: 12px; color: #666;">$address</div>
+        </div>
+      ''';
+
+      final iwOptions = js.JsObject.jsify({
+        'content': iwContent,
+        'removable': true,
+      });
+      final infowindow = js.JsObject(kakaoMaps['InfoWindow'] as js.JsFunction, [iwOptions]);
+
+      final kakaoEvent = kakaoMaps['event'];
+      kakaoEvent.callMethod('addListener', [
+        marker,
+        'click',
+        js.allowInterop(() {
+          if (_activeInfoWindow != null) {
+            _activeInfoWindow!.callMethod('close');
+          }
+          infowindow.callMethod('open', [_mapInstance, marker]);
+          _activeInfoWindow = infowindow;
+        })
+      ]);
+
+      if (isOpen) {
+        if (_activeInfoWindow != null) {
+          _activeInfoWindow!.callMethod('close');
+        }
+        infowindow.callMethod('open', [_mapInstance, marker]);
+        _activeInfoWindow = infowindow;
+      }
+    } catch (e) {
+      debugPrint('[Ratip] Add marker error: $e');
     }
   }
 
@@ -514,13 +568,38 @@ class _MainMapScreenState extends State<MainMapScreen> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => const PlaceSearchScreen()),
-                ).then((selectedPlace) {
-                  if (selectedPlace != null && selectedPlace is Map<String, dynamic>) {
+                ).then((result) {
+                  if (result != null && result is Map<String, dynamic>) {
                     try {
-                      final lat = double.parse(selectedPlace['y']);
-                      final lng = double.parse(selectedPlace['x']);
-                      _moveToLocation(lat, lng);
-                      _showSearchPulse(lat, lng); // Trigger pulse effect
+                      final selectedPlace = result['selected'];
+                      final allResults = result['results'] as List<dynamic>? ?? [];
+
+                      // clear existing markers
+                      for (final marker in _searchMarkers) {
+                        marker.callMethod('setMap', [null]);
+                      }
+                      _searchMarkers.clear();
+
+                      if (_activeInfoWindow != null) {
+                        _activeInfoWindow!.callMethod('close');
+                      }
+
+                      // plot all results
+                      for (var p in allResults) {
+                        final lat = double.parse(p['y'].toString());
+                        final lng = double.parse(p['x'].toString());
+                        final name = p['place_name']?.toString() ?? '';
+                        final addr = p['road_address_name']?.toString().isNotEmpty == true 
+                                     ? p['road_address_name'].toString() 
+                                     : (p['address_name']?.toString() ?? '');
+                        _addSearchResultMarker(lat, lng, name, addr, isOpen: p == selectedPlace);
+                      }
+
+                      // move to selected place
+                      final selectedLat = double.parse(selectedPlace['y'].toString());
+                      final selectedLng = double.parse(selectedPlace['x'].toString());
+                      _moveToLocation(selectedLat, selectedLng);
+                      _showSearchPulse(selectedLat, selectedLng); // Trigger pulse effect
                       
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
