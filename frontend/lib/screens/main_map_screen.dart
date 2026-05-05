@@ -792,6 +792,29 @@ class _MainMapScreenState extends State<MainMapScreen> {
     final phone = _selectedPlaceDetails!['phone'] as String? ?? '';
     final placeUrl = _selectedPlaceDetails!['placeUrl'] as String? ?? '';
 
+    // Helper to get a relevant image keyword
+    String getImgKeyword() {
+      final name = placeName.toLowerCase();
+      final cat = category.toLowerCase();
+      
+      if (cat.contains('카페') || name.contains('카페') || name.contains('cafe') || name.contains('커피')) return 'cafe,coffee';
+      if (cat.contains('음식점') || cat.contains('식당') || name.contains('맛집') || name.contains('푸드')) return 'restaurant,food';
+      if (cat.contains('병원')) return 'hospital,medical';
+      if (cat.contains('약국')) return 'pharmacy';
+      if (cat.contains('학교') || cat.contains('대학') || cat.contains('학원')) return 'school,university';
+      if (cat.contains('은행')) return 'bank';
+      if (cat.contains('편의점') || cat.contains('마트') || cat.contains('백화점')) return 'shop,store';
+      if (cat.contains('공원') || cat.contains('산') || cat.contains('숲')) return 'park,nature';
+      if (cat.contains('지하철') || cat.contains('역') || cat.contains('터미널')) return 'subway,station';
+      if (cat.contains('숙박') || cat.contains('호텔') || cat.contains('모텔')) return 'hotel,room';
+      if (cat.contains('주차장')) return 'parking,car';
+      if (cat.contains('문화') || cat.contains('영화') || cat.contains('극장')) return 'culture,cinema';
+      
+      return 'building,city';
+    }
+
+    final imageUrl = 'https://loremflickr.com/400/300/${getImgKeyword()}';
+
     return Container(
       width: 320,
       decoration: BoxDecoration(
@@ -809,14 +832,14 @@ class _MainMapScreenState extends State<MainMapScreen> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Header image placeholder
+          // Dynamic Header image
           Container(
             height: 140,
-            decoration: const BoxDecoration(
-              color: Color(0xFFF1F3F4),
-              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF1F3F4),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
               image: DecorationImage(
-                image: NetworkImage('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=400&q=80'), // Placeholder
+                image: NetworkImage('$imageUrl?lock=${placeName.hashCode}'),
                 fit: BoxFit.cover,
               ),
             ),
