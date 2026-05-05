@@ -236,18 +236,24 @@ class _MainMapScreenState extends State<MainMapScreen> {
       final kakaoMaps = js.context['kakao']['maps'];
       final latLng = js.JsObject(kakaoMaps['LatLng'] as js.JsFunction, [lat, lng]);
 
-      final markerOptions = js.JsObject.jsify({
+      // 1. Create Custom Marker
+      final markerEl = html.DivElement()..className = 'ratip-marker';
+      final markerOverlayOptions = js.JsObject.jsify({
         'position': latLng,
-        'map': _mapInstance,
+        'content': markerEl,
+        'yAnchor': 0.5,
       });
-      final marker = js.JsObject(kakaoMaps['Marker'] as js.JsFunction, [markerOptions]);
-      _searchMarkers.add(marker);
+      final markerOverlay = js.JsObject(kakaoMaps['CustomOverlay'] as js.JsFunction, [markerOverlayOptions]);
+      markerOverlay.callMethod('setMap', [_mapInstance]);
+      _searchMarkers.add(markerOverlay);
 
+      // 2. Create Custom Popup (InfoWindow)
+      final popupContainer = html.DivElement()..className = 'ratip-popup-container';
+      final popupEl = html.DivElement()..className = 'ratip-popup';
+      
       final contentWrapper = html.DivElement()
-        ..style.padding = '15px'
         ..style.fontFamily = "'Inter', sans-serif"
         ..style.textAlign = 'center'
-        ..style.minWidth = '150px'
         ..style.cursor = 'pointer';
 
       final titleDiv = html.DivElement()
@@ -274,6 +280,38 @@ class _MainMapScreenState extends State<MainMapScreen> {
         contentWrapper.append(catDiv);
       }
 
+      // Close button for popup
+      final closeBtn = html.DivElement()
+        ..style.position = 'absolute'
+        ..style.top = '8px'
+        ..style.right = '8px'
+        ..style.fontSize = '14px'
+        ..style.color = '#999'
+        ..style.cursor = 'pointer'
+        ..style.padding = '4px'
+        ..innerHtml = '&times;';
+
+      popupEl.append(closeBtn);
+      popupEl.append(contentWrapper);
+      popupContainer.append(popupEl);
+
+      final popupOverlayOptions = js.JsObject.jsify({
+        'position': latLng,
+        'content': popupContainer,
+        'zIndex': 1000,
+      });
+      final popupOverlay = js.JsObject(kakaoMaps['CustomOverlay'] as js.JsFunction, [popupOverlayOptions]);
+
+      // Interaction: Marker Click -> Show Popup
+      markerEl.onClick.listen((_) {
+        if (_activeInfoWindow != null) {
+          _activeInfoWindow!.callMethod('setMap', [null]);
+        }
+        popupOverlay.callMethod('setMap', [_mapInstance]);
+        _activeInfoWindow = popupOverlay;
+      });
+
+      // Interaction: Popup Content Click -> Show Left Panel
       contentWrapper.onClick.listen((_) {
         if (mounted) {
           setState(() {
@@ -290,34 +328,22 @@ class _MainMapScreenState extends State<MainMapScreen> {
         }
       });
 
-      final iwOptions = js.JsObject.jsify({
-        'content': contentWrapper,
-        'removable': true,
-      });
-      final infowindow = js.JsObject(kakaoMaps['InfoWindow'] as js.JsFunction, [iwOptions]);
-
-      final kakaoEvent = kakaoMaps['event'];
-      kakaoEvent.callMethod('addListener', [
-        marker,
-        'click',
-        js.allowInterop(() {
-          if (_activeInfoWindow != null) {
-            _activeInfoWindow!.callMethod('close');
-          }
-          infowindow.callMethod('open', [_mapInstance, marker]);
-          _activeInfoWindow = infowindow;
-        })
-      ]);
-
-      if (isOpen) {
-        if (_activeInfoWindow != null) {
-          _activeInfoWindow!.callMethod('close');
+      // Interaction: Close Button Click
+      closeBtn.onClick.listen((e) {
+        e.stopPropagation();
+        popupOverlay.callMethod('setMap', [null]);
+        if (_activeInfoWindow == popupOverlay) {
+          _activeInfoWindow = null;
         }
-        infowindow.callMethod('open', [_mapInstance, marker]);
-        _activeInfoWindow = infowindow;
-      }
+      });
+
+      // User's specific request: "Only show when marker is clicked"
+      // So even if isOpen is true (from search result), we don't open it immediately.
+      // But for better UX during search, maybe we can keep it? 
+      // The user said: "각 마크를 눌러야만 팝업이 나오게" (Make it so the popup ONLY comes out when pressing each mark).
+      // So I will IGNORE the isOpen flag here.
     } catch (e) {
-      debugPrint('[Ratip] Add marker error: $e');
+      debugPrint('[Ratip] Add custom marker error: $e');
     }
   }
 
@@ -479,6 +505,55 @@ class _MainMapScreenState extends State<MainMapScreen> {
               [container, options],
             );
             debugPrint('[Ratip] ✅ Kakao Map 렌더링 성공!');
+
+            // Inject Custom Styles for Animations and Markers
+            final style = html.StyleElement()
+              ..text = '''
+                @keyframes ratipPopupFadeIn {
+                  from { opacity: 0; transform: translateY(10px) scale(0.9); }
+                  to { opacity: 1; transform: translateY(0) scale(1); }
+                }
+                .ratip-marker {
+                  width: 20px;
+                  height: 20px;
+                  background-color: #4285F4;
+                  border: 3px solid white;
+                  border-radius: 50%;
+                  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+                  cursor: pointer;
+                  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                }
+                .ratip-marker:hover {
+                  transform: scale(1.4);
+                  z-index: 999;
+                }
+                .ratip-popup-container {
+                  position: relative;
+                  bottom: 45px;
+                  left: 0;
+                  transform: translateX(-50%);
+                }
+                .ratip-popup {
+                  background: white;
+                  border-radius: 18px;
+                  box-shadow: 0 10px 40px rgba(0,0,0,0.18);
+                  padding: 16px;
+                  min-width: 180px;
+                  animation: ratipPopupFadeIn 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+                  transform-origin: bottom center;
+                }
+                .ratip-popup::after {
+                  content: '';
+                  position: absolute;
+                  bottom: -8px;
+                  left: 50%;
+                  transform: translateX(-50%);
+                  border-left: 8px solid transparent;
+                  border-right: 8px solid transparent;
+                  border-top: 8px solid white;
+                }
+              ''';
+            html.document.head!.append(style);
 
             // Add map click listener for POI-like behavior
             final kakaoEvent = js.context['kakao']['maps']['event'];
