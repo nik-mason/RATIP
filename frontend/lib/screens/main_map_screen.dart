@@ -239,10 +239,7 @@ class _MainMapScreenState extends State<MainMapScreen> {
 
       // 1. Create Enhanced Custom Marker (Icon + Name)
       final markerContainer = html.DivElement()..className = 'ratip-marker-container';
-      
       final markerIcon = html.DivElement()..className = 'ratip-marker-icon';
-      // If it's a specific category, we could change the icon color/content here
-      
       final markerLabel = html.DivElement()
         ..className = 'ratip-marker-label'
         ..text = placeName;
@@ -259,8 +256,48 @@ class _MainMapScreenState extends State<MainMapScreen> {
       markerOverlay.callMethod('setMap', [_mapInstance]);
       _searchMarkers.add(markerOverlay);
 
-      // 2. Interaction: Marker Click -> Directly Show Left Panel
+      // 2. Create Custom Popup (Restored)
+      final popupContainer = html.DivElement()..className = 'ratip-popup-container';
+      final popupEl = html.DivElement()..className = 'ratip-popup';
+      
+      final popupContent = html.DivElement()
+        ..style.fontFamily = "'Inter', sans-serif"
+        ..style.textAlign = 'center'
+        ..style.cursor = 'pointer';
+
+      final popupTitle = html.DivElement()
+        ..style.fontWeight = 'bold'
+        ..style.fontSize = '14px'
+        ..style.color = '#333'
+        ..text = placeName;
+
+      popupContent.append(popupTitle);
+      
+      final closeBtn = html.DivElement()
+        ..className = 'ratip-popup-close'
+        ..innerHtml = '&times;';
+
+      popupEl.append(closeBtn);
+      popupEl.append(popupContent);
+      popupContainer.append(popupEl);
+
+      final popupOverlayOptions = js.JsObject.jsify({
+        'position': latLng,
+        'content': popupContainer,
+        'zIndex': 1000,
+      });
+      final popupOverlay = js.JsObject(kakaoMaps['CustomOverlay'] as js.JsFunction, [popupOverlayOptions]);
+
+      // 3. Interaction: Marker Click -> Show Popup & Show Side Panel
       markerContainer.onClick.listen((_) {
+        // Show map popup
+        if (_activeInfoWindow != null) {
+          _activeInfoWindow!.callMethod('setMap', [null]);
+        }
+        popupOverlay.callMethod('setMap', [_mapInstance]);
+        _activeInfoWindow = popupOverlay;
+
+        // Show side panel
         if (mounted) {
           setState(() {
             _selectedPlaceDetails = {
@@ -273,7 +310,34 @@ class _MainMapScreenState extends State<MainMapScreen> {
               'placeUrl': placeUrl ?? '',
             };
           });
-          _moveToLocation(lat, lng);
+          // Only move if needed, but user said "stop moving" earlier.
+          // Let's keep it still for now as per previous fix.
+        }
+      });
+
+      // Close Button Interaction
+      closeBtn.onClick.listen((e) {
+        e.stopPropagation();
+        popupOverlay.callMethod('setMap', [null]);
+        if (_activeInfoWindow == popupOverlay) {
+          _activeInfoWindow = null;
+        }
+      });
+
+      // Popup Content Click -> Ensure panel is shown
+      popupContent.onClick.listen((_) {
+        if (mounted) {
+          setState(() {
+            _selectedPlaceDetails = {
+              'place_name': placeName,
+              'road_address_name': address,
+              'lat': lat,
+              'lng': lng,
+              'phone': phone ?? '',
+              'category': category ?? '',
+              'placeUrl': placeUrl ?? '',
+            };
+          });
         }
       });
 
@@ -441,9 +505,13 @@ class _MainMapScreenState extends State<MainMapScreen> {
             );
             debugPrint('[Ratip] ✅ Kakao Map 렌더링 성공!');
 
-            // Inject Custom Styles for Animated Enhanced Markers
+            // Inject Custom Styles for Animated Enhanced Markers and Popups
             final style = html.StyleElement()
               ..text = '''
+                @keyframes ratipPopupFadeIn {
+                  from { opacity: 0; transform: translateY(10px) scale(0.95); }
+                  to { opacity: 1; transform: translateY(0) scale(1); }
+                }
                 .ratip-marker-container {
                   display: flex;
                   flex-direction: column;
@@ -492,6 +560,43 @@ class _MainMapScreenState extends State<MainMapScreen> {
                   background-color: #4285F4;
                   color: white;
                 }
+                .ratip-popup-container {
+                  position: relative;
+                  bottom: 65px;
+                  left: 0;
+                  transform: translateX(-50%);
+                  pointer-events: auto;
+                }
+                .ratip-popup {
+                  background: white;
+                  border-radius: 12px;
+                  box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+                  padding: 10px 15px;
+                  min-width: 120px;
+                  animation: ratipPopupFadeIn 0.2s ease-out;
+                  transform-origin: bottom center;
+                  border: 1px solid rgba(0,0,0,0.05);
+                }
+                .ratip-popup::after {
+                  content: '';
+                  position: absolute;
+                  bottom: -6px;
+                  left: 50%;
+                  transform: translateX(-50%);
+                  border-left: 6px solid transparent;
+                  border-right: 6px solid transparent;
+                  border-top: 6px solid white;
+                }
+                .ratip-popup-close {
+                  position: absolute;
+                  top: 4px;
+                  right: 4px;
+                  font-size: 16px;
+                  color: #aaa;
+                  cursor: pointer;
+                  line-height: 1;
+                }
+                .ratip-popup-close:hover { color: #666; }
               ''';
             html.document.head!.append(style);
 
@@ -678,7 +783,7 @@ class _MainMapScreenState extends State<MainMapScreen> {
             child: PointerInterceptor(child: _buildSearchBar()),
           ),
           
-          // ── 3) Left sidebar navigation (Google Maps style vertical icons)
+          // ── 3) Left sidebar navigation or Responsive Detail Panel
           if (_selectedPlaceDetails == null)
             Positioned(
               left: 16,
@@ -686,12 +791,7 @@ class _MainMapScreenState extends State<MainMapScreen> {
               child: PointerInterceptor(child: _buildSideNav()),
             )
           else
-            Positioned(
-              left: 16,
-              top: topPadding + 80,
-              bottom: 100, // Leave space for map controls
-              child: PointerInterceptor(child: _buildLeftDetailPanel()),
-            ),
+            _buildResponsiveDetailPanel(context, topPadding),
 
           // ── 4) Right-side controls (zoom, my location)
           Positioned(
@@ -823,8 +923,34 @@ class _MainMapScreenState extends State<MainMapScreen> {
     );
   }
 
-  /// Left detail panel when a place is selected
-  Widget _buildLeftDetailPanel() {
+  Widget _buildResponsiveDetailPanel(BuildContext context, double topPadding) {
+    final isMobile = MediaQuery.of(context).size.width < 600;
+    if (isMobile) {
+      return Positioned(
+        left: 0,
+        right: 0,
+        bottom: 0,
+        child: PointerInterceptor(child: _buildMobileDetailPanel()),
+      );
+    } else {
+      return Positioned(
+        left: 0,
+        top: 0,
+        bottom: 0,
+        child: PointerInterceptor(child: _buildDesktopDetailPanel()),
+      );
+    }
+  }
+
+  Widget _buildDesktopDetailPanel() {
+    return _buildBaseDetailPanel(isMobile: false);
+  }
+
+  Widget _buildMobileDetailPanel() {
+    return _buildBaseDetailPanel(isMobile: true);
+  }
+
+  Widget _buildBaseDetailPanel({required bool isMobile}) {
     if (_selectedPlaceDetails == null) return const SizedBox.shrink();
     
     final placeName = _selectedPlaceDetails!['place_name'] as String;
@@ -833,175 +959,124 @@ class _MainMapScreenState extends State<MainMapScreen> {
     final phone = _selectedPlaceDetails!['phone'] as String? ?? '';
     final placeUrl = _selectedPlaceDetails!['placeUrl'] as String? ?? '';
 
-    // Helper to get a relevant image keyword
     String getImgKeyword() {
       final name = placeName.toLowerCase();
       final cat = category.toLowerCase();
-      
-      if (cat.contains('카페') || name.contains('카페') || name.contains('cafe') || name.contains('커피')) return 'cafe,coffee';
-      if (cat.contains('음식점') || cat.contains('식당') || name.contains('맛집') || name.contains('푸드')) return 'restaurant,food';
-      if (cat.contains('병원')) return 'hospital,medical';
-      if (cat.contains('약국')) return 'pharmacy';
-      if (cat.contains('학교') || cat.contains('대학') || cat.contains('학원')) return 'school,university';
-      if (cat.contains('은행')) return 'bank';
-      if (cat.contains('편의점') || cat.contains('마트') || cat.contains('백화점')) return 'shop,store';
-      if (cat.contains('공원') || cat.contains('산') || cat.contains('숲')) return 'park,nature';
-      if (cat.contains('지하철') || cat.contains('역') || cat.contains('터미널')) return 'subway,station';
-      if (cat.contains('숙박') || cat.contains('호텔') || cat.contains('모텔')) return 'hotel,room';
-      if (cat.contains('주차장')) return 'parking,car';
-      if (cat.contains('문화') || cat.contains('영화') || cat.contains('극장')) return 'culture,cinema';
-      
-      return 'building,city';
+      if (cat.contains('카페') || name.contains('카페')) return 'cafe';
+      if (cat.contains('음식점') || cat.contains('식당')) return 'restaurant';
+      return 'city,building';
     }
 
-    final imageUrl = 'https://loremflickr.com/400/300/${getImgKeyword()}';
+    final imageUrl = 'https://loremflickr.com/400/300/${getImgKeyword()}?lock=${placeName.hashCode}';
 
     return Container(
-      width: 320,
+      width: isMobile ? double.infinity : 380,
+      height: isMobile ? MediaQuery.of(context).size.height * 0.45 : double.infinity,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: isMobile 
+          ? const BorderRadius.vertical(top: Radius.circular(24))
+          : const BorderRadius.only(topRight: Radius.circular(24), bottomRight: Radius.circular(24)),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.12),
-            blurRadius: 16,
-            offset: const Offset(0, 4),
+            blurRadius: 20,
+            offset: isMobile ? const Offset(0, -4) : const Offset(4, 0),
           ),
         ],
       ),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Dynamic Header image
-          Container(
-            height: 140,
-            decoration: BoxDecoration(
-              color: const Color(0xFFF1F3F4),
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
-              image: DecorationImage(
-                image: NetworkImage('$imageUrl?lock=${placeName.hashCode}'),
-                fit: BoxFit.cover,
-              ),
-            ),
-            alignment: Alignment.topRight,
-            padding: const EdgeInsets.all(8),
-            child: Material(
-              color: Colors.white.withOpacity(0.8),
-              shape: const CircleBorder(),
-              child: IconButton(
-                icon: const Icon(Icons.close, size: 20, color: Color(0xFF3C4043)),
-                onPressed: () {
-                  setState(() {
-                    _selectedPlaceDetails = null;
-                  });
-                },
-                constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
-                padding: EdgeInsets.zero,
-              ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  placeName,
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF3C4043),
+          Stack(
+            children: [
+              Container(
+                height: isMobile ? 180 : 240,
+                decoration: BoxDecoration(
+                  borderRadius: isMobile 
+                    ? const BorderRadius.vertical(top: Radius.circular(24))
+                    : const BorderRadius.only(topRight: Radius.circular(24)),
+                  image: DecorationImage(
+                    image: NetworkImage(imageUrl),
+                    fit: BoxFit.cover,
                   ),
                 ),
-                if (category.isNotEmpty) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    category,
-                    style: const TextStyle(
-                      fontSize: 13,
-                      color: Color(0xFF4285F4),
-                      fontWeight: FontWeight.w500,
-                    ),
+              ),
+              Positioned(
+                top: 16,
+                right: 16,
+                child: Material(
+                  color: Colors.white.withOpacity(0.9),
+                  shape: const CircleBorder(),
+                  child: IconButton(
+                    icon: const Icon(Icons.close, color: Colors.black87),
+                    onPressed: () => setState(() {
+                      _selectedPlaceDetails = null;
+                      if (_activeInfoWindow != null) {
+                        _activeInfoWindow!.callMethod('setMap', [null]);
+                        _activeInfoWindow = null;
+                      }
+                    }),
                   ),
-                ],
-                const SizedBox(height: 12),
-                Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Icon(Icons.location_on, size: 16, color: Color(0xFF5F6368)),
-                    const SizedBox(width: 4),
-                    Expanded(
-                      child: Text(
-                        address,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Color(0xFF5F6368),
-                          height: 1.3,
+                ),
+              ),
+            ],
+          ),
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (category.isNotEmpty) ...[
+                    Text(category, style: TextStyle(color: AppTheme.primaryColor, fontWeight: FontWeight.bold, fontSize: 12)),
+                    const SizedBox(height: 8),
+                  ],
+                  Text(placeName, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                  const SizedBox(height: 16),
+                  const Divider(),
+                  _detailRow(Icons.location_on_outlined, address),
+                  if (phone.isNotEmpty) ...[
+                    const SizedBox(height: 12),
+                    _detailRow(Icons.phone_outlined, phone),
+                  ],
+                  const SizedBox(height: 32),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () { if (placeUrl.isNotEmpty) html.window.open(placeUrl, '_blank'); },
+                          icon: const Icon(Icons.directions),
+                          label: const Text('길찾기'),
+                          style: ElevatedButton.styleFrom(backgroundColor: AppTheme.primaryColor, foregroundColor: Colors.white),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                if (phone.isNotEmpty) ...[
-                  const SizedBox(height: 8),
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const Icon(Icons.phone, size: 16, color: Color(0xFF5F6368)),
-                      const SizedBox(width: 4),
-                      Text(
-                        phone,
-                        style: const TextStyle(
-                          fontSize: 14,
-                          color: Color(0xFF5F6368),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: OutlinedButton.icon(
+                          onPressed: () {},
+                          icon: const Icon(Icons.bookmark_border),
+                          label: const Text('저장'),
                         ),
                       ),
                     ],
                   ),
                 ],
-                const SizedBox(height: 24),
-                Row(
-                  children: [
-                    Expanded(
-                      child: ElevatedButton.icon(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppTheme.primaryColor,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                          elevation: 0,
-                        ),
-                        onPressed: () {
-                          if (placeUrl.isNotEmpty) {
-                            html.window.open(placeUrl, '_blank');
-                          }
-                        },
-                        icon: const Icon(Icons.info_outline, size: 18),
-                        label: const Text('카카오맵', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: OutlinedButton.icon(
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: const Color(0xFF3C4043),
-                          side: const BorderSide(color: Color(0xFFE8EAED)),
-                          padding: const EdgeInsets.symmetric(vertical: 12),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        ),
-                        onPressed: () {},
-                        icon: const Icon(Icons.bookmark_border, size: 18),
-                        label: const Text('저장', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+              ),
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _detailRow(IconData icon, String text) {
+    return Row(
+      children: [
+        Icon(icon, size: 20, color: Colors.grey),
+        const SizedBox(width: 12),
+        Expanded(child: Text(text, style: const TextStyle(fontSize: 14))),
+      ],
     );
   }
 
