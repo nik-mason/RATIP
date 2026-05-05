@@ -230,7 +230,7 @@ class _MainMapScreenState extends State<MainMapScreen> {
     }
   }
 
-  void _addSearchResultMarker(double lat, double lng, String placeName, String address, {bool isOpen = false}) {
+  void _addSearchResultMarker(double lat, double lng, String placeName, String address, {bool isOpen = false, String? phone, String? category, String? placeUrl}) {
     if (_mapInstance == null) return;
     try {
       final kakaoMaps = js.context['kakao']['maps'];
@@ -264,6 +264,15 @@ class _MainMapScreenState extends State<MainMapScreen> {
 
       contentWrapper.append(titleDiv);
       contentWrapper.append(addrDiv);
+      
+      if (category != null && category.isNotEmpty) {
+        final catDiv = html.DivElement()
+          ..style.fontSize = '11px'
+          ..style.color = '#4285F4'
+          ..style.marginTop = '4px'
+          ..text = category;
+        contentWrapper.append(catDiv);
+      }
 
       contentWrapper.onClick.listen((_) {
         if (mounted) {
@@ -273,6 +282,9 @@ class _MainMapScreenState extends State<MainMapScreen> {
               'road_address_name': address,
               'lat': lat,
               'lng': lng,
+              'phone': phone ?? '',
+              'category': category ?? '',
+              'placeUrl': placeUrl ?? '',
             };
           });
         }
@@ -492,8 +504,10 @@ class _MainMapScreenState extends State<MainMapScreen> {
                   _activeState!._selectedPlaceDetails = null;
                 });
                 
-                // Reverse geocoding
+                // Reverse geocoding & Places search
                 final geocoder = js.JsObject(js.context['kakao']['maps']['services']['Geocoder'] as js.JsFunction);
+                final places = js.JsObject(js.context['kakao']['maps']['services']['Places'] as js.JsFunction);
+
                 geocoder.callMethod('coord2Address', [lng, lat, js.allowInterop((result, status) {
                   if (status == 'OK') {
                     final list = result as List<dynamic>;
@@ -502,23 +516,55 @@ class _MainMapScreenState extends State<MainMapScreen> {
                       final roadAddress = item['road_address'];
                       final address = item['address'];
                       
-                      String placeName = '선택된 위치';
+                      String fallbackPlaceName = '선택된 위치';
                       String addrName = '';
+                      String keyword = '';
                       
                       if (roadAddress != null) {
                         final jsRoadAddress = roadAddress as js.JsObject;
                         final buildingName = jsRoadAddress['building_name'];
                         if (buildingName != null && buildingName.toString().trim().isNotEmpty) {
-                          placeName = buildingName.toString();
+                          fallbackPlaceName = buildingName.toString();
                         }
                         addrName = jsRoadAddress['address_name']?.toString() ?? '';
                       } else if (address != null) {
                         final jsAddress = address as js.JsObject;
                         addrName = jsAddress['address_name']?.toString() ?? '';
                       }
-                      
-                      _activeState!._addSearchResultMarker(lat as double, lng as double, placeName, addrName, isOpen: true);
-                      _activeState!._moveToLocation(lat, lng);
+
+                      keyword = fallbackPlaceName != '선택된 위치' ? fallbackPlaceName : addrName;
+
+                      if (keyword.isNotEmpty) {
+                         final searchOptions = js.JsObject.jsify({
+                           'x': lng,
+                           'y': lat,
+                           'radius': 50,
+                           'sort': js.context['kakao']['maps']['services']['SortBy']['DISTANCE']
+                         });
+                         places.callMethod('keywordSearch', [keyword, js.allowInterop((placeResult, placeStatus, pagination) {
+                             if (placeStatus == 'OK') {
+                                 final pList = placeResult as List<dynamic>;
+                                 if (pList.isNotEmpty) {
+                                     final place = pList[0] as js.JsObject;
+                                     final realName = place['place_name']?.toString() ?? fallbackPlaceName;
+                                     final phone = place['phone']?.toString() ?? '';
+                                     final category = place['category_group_name']?.toString() ?? '';
+                                     final placeUrl = place['place_url']?.toString() ?? '';
+                                     
+                                     _activeState!._addSearchResultMarker(lat as double, lng as double, realName, addrName, isOpen: true, phone: phone, category: category, placeUrl: placeUrl);
+                                     _activeState!._moveToLocation(lat as double, lng as double);
+                                     return;
+                                 }
+                             }
+                             // Fallback
+                             _activeState!._addSearchResultMarker(lat as double, lng as double, fallbackPlaceName, addrName, isOpen: true);
+                             _activeState!._moveToLocation(lat as double, lng as double);
+                         }), searchOptions]);
+                      } else {
+                         // Fallback
+                         _activeState!._addSearchResultMarker(lat as double, lng as double, fallbackPlaceName, addrName, isOpen: true);
+                         _activeState!._moveToLocation(lat as double, lng as double);
+                      }
                     }
                   }
                 })]);
@@ -742,6 +788,9 @@ class _MainMapScreenState extends State<MainMapScreen> {
     
     final placeName = _selectedPlaceDetails!['place_name'] as String;
     final address = _selectedPlaceDetails!['road_address_name'] as String;
+    final category = _selectedPlaceDetails!['category'] as String? ?? '';
+    final phone = _selectedPlaceDetails!['phone'] as String? ?? '';
+    final placeUrl = _selectedPlaceDetails!['placeUrl'] as String? ?? '';
 
     return Container(
       width: 320,
@@ -801,7 +850,18 @@ class _MainMapScreenState extends State<MainMapScreen> {
                     color: Color(0xFF3C4043),
                   ),
                 ),
-                const SizedBox(height: 8),
+                if (category.isNotEmpty) ...[
+                  const SizedBox(height: 4),
+                  Text(
+                    category,
+                    style: const TextStyle(
+                      fontSize: 13,
+                      color: Color(0xFF4285F4),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+                const SizedBox(height: 12),
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -819,6 +879,23 @@ class _MainMapScreenState extends State<MainMapScreen> {
                     ),
                   ],
                 ),
+                if (phone.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.phone, size: 16, color: Color(0xFF5F6368)),
+                      const SizedBox(width: 4),
+                      Text(
+                        phone,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Color(0xFF5F6368),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
                 const SizedBox(height: 24),
                 Row(
                   children: [
@@ -831,9 +908,13 @@ class _MainMapScreenState extends State<MainMapScreen> {
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           elevation: 0,
                         ),
-                        onPressed: () {},
-                        icon: const Icon(Icons.directions, size: 18),
-                        label: const Text('길찾기', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                        onPressed: () {
+                          if (placeUrl.isNotEmpty) {
+                            html.window.open(placeUrl, '_blank');
+                          }
+                        },
+                        icon: const Icon(Icons.info_outline, size: 18),
+                        label: const Text('카카오맵', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
                       ),
                     ),
                     const SizedBox(width: 12),
