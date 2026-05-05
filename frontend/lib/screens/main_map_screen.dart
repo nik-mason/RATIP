@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:pointer_interceptor/pointer_interceptor.dart';
 import 'package:ratip/theme/app_theme.dart';
 import 'dart:ui_web' as ui_web;
 import 'dart:html' as html;
@@ -566,18 +567,44 @@ class _MainMapScreenState extends State<MainMapScreen> {
                                      final placeUrl = place['place_url']?.toString() ?? '';
                                      
                                      _activeState!._addSearchResultMarker(lat as double, lng as double, realName, addrName, isOpen: true, phone: phone, category: category, placeUrl: placeUrl);
-                                     _activeState!._moveToLocation(lat as double, lng as double);
+                                     
+                                     // Directly show side panel
+                                     _activeState!.setState(() {
+                                       _activeState!._selectedPlaceDetails = {
+                                         'place_name': realName,
+                                         'road_address_name': addrName,
+                                         'lat': lat,
+                                         'lng': lng,
+                                         'phone': phone,
+                                         'category': category,
+                                         'placeUrl': placeUrl,
+                                       };
+                                     });
                                      return;
                                  }
                              }
                              // Fallback
                              _activeState!._addSearchResultMarker(lat as double, lng as double, fallbackPlaceName, addrName, isOpen: true);
-                             _activeState!._moveToLocation(lat as double, lng as double);
+                             _activeState!.setState(() {
+                               _activeState!._selectedPlaceDetails = {
+                                 'place_name': fallbackPlaceName,
+                                 'road_address_name': addrName,
+                                 'lat': lat,
+                                 'lng': lng,
+                               };
+                             });
                          }), searchOptions]);
                       } else {
                          // Fallback
                          _activeState!._addSearchResultMarker(lat as double, lng as double, fallbackPlaceName, addrName, isOpen: true);
-                         _activeState!._moveToLocation(lat as double, lng as double);
+                         _activeState!.setState(() {
+                           _activeState!._selectedPlaceDetails = {
+                             'place_name': fallbackPlaceName,
+                             'road_address_name': addrName,
+                             'lat': lat,
+                             'lng': lng,
+                           };
+                         });
                       }
                     }
                   }
@@ -648,36 +675,36 @@ class _MainMapScreenState extends State<MainMapScreen> {
             top: topPadding + 12,
             left: 16,
             right: 16,
-            child: _buildSearchBar(),
+            child: PointerInterceptor(child: _buildSearchBar()),
           ),
-
-          // ── 3) Left sidebar nav icons or Left detail panel
+          
+          // ── 3) Left sidebar navigation (Google Maps style vertical icons)
           if (_selectedPlaceDetails == null)
             Positioned(
               left: 16,
               top: topPadding + 80,
-              child: _buildSideNav(),
+              child: PointerInterceptor(child: _buildSideNav()),
             )
           else
             Positioned(
               left: 16,
               top: topPadding + 80,
               bottom: 100, // Leave space for map controls
-              child: _buildLeftDetailPanel(),
+              child: PointerInterceptor(child: _buildLeftDetailPanel()),
             ),
 
           // ── 4) Right-side controls (zoom, my location)
           Positioned(
             right: 16,
             bottom: 100,
-            child: _buildMapControls(),
+            child: PointerInterceptor(child: _buildMapControls()),
           ),
 
           // ── 5) Bottom-left "Layers" chip
           Positioned(
             left: 16,
             bottom: 24,
-            child: _buildLayersChip(),
+            child: PointerInterceptor(child: _buildLayersChip()),
           ),
         ],
       ),
