@@ -18,7 +18,7 @@
                 <i data-lucide="compass" class="logo-icon"></i>
                 <span>Ratip</span>
             </div>
-            <a href="#download" class="btn-primary-sm">시작하기</a>
+            <a href="#" class="btn-primary-sm">Log In</a>
         </div>
     </nav>
 
@@ -38,8 +38,7 @@
                 Ratip은 '남들이 좋다는 곳'이 아니라 <strong>'내가 가본 곳, 내가 좋아할 곳'</strong>에 집중하는 개인화 위치 기록과 게이미피케이션이 결합된 혁신적인 플랫폼입니다. 당신의 모든 발걸음을 가치 있는 기록으로 전환하세요.
             </p>
             <div class="hero-buttons fade-up delay-3">
-                <a href="#download" class="btn-primary">앱 다운로드 <i data-lucide="arrow-right"></i></a>
-                <a href="#features" class="btn-secondary">더 알아보기</a>
+                <a href="#" class="btn-primary">Log In <i data-lucide="arrow-right"></i></a>
             </div>
             
             <div class="hero-mockup fade-up delay-4">
@@ -103,19 +102,9 @@
                         <span class="rank-badge text-gradient">✨ 레전드</span>
                     </div>
 
-                    <div class="achievements-preview mt-4">
-                        <div class="achievement-item">
-                            <span class="ach-title">🇰🇷 전국 일주</span>
-                            <span class="ach-reward">1,000G</span>
-                        </div>
-                        <div class="achievement-item">
-                            <span class="ach-title">🌏 지구 한 바퀴</span>
-                            <span class="ach-reward">5,000G</span>
-                        </div>
-                        <div class="achievement-item">
-                            <span class="ach-title">🏆 라팁 마스터</span>
-                            <span class="ach-reward">3,000G</span>
-                        </div>
+                    <div class="feature-buttons mt-4">
+                        <button class="btn-outline-primary" id="view-ranks">전체 랭크 보기</button>
+                        <button class="btn-outline-orange" id="view-achievements">모든 업적 보기</button>
                     </div>
                 </div>
             </div>
@@ -187,14 +176,8 @@
             <p class="text-white-80 mb-6">Ratip은 단순한 앱이 아닙니다. 당신의 모든 여정을 하나의 작품으로 만들어줄 파트너입니다. 지금 바로 여정을 시작하세요.</p>
             
             <div class="cta-buttons">
-                <a href="#" class="btn-app">
-                    <i data-lucide="apple"></i>
-                    App Store에서 시작하기
-                </a>
-                <a href="#" class="btn-app outline">
-                    <i data-lucide="play"></i>
-                    Google Play에서 시작하기
-                </a>
+                <a href="#" class="btn-white">Ratip 로그인</a>
+                <a href="#" class="btn-outline-white">둘러보기 (Log In)</a>
             </div>
         </div>
         <div class="wave"></div>
@@ -217,6 +200,19 @@
             </div>
         </div>
     </footer>
+
+    <!-- Modals -->
+    <div id="modal-container" class="modal-overlay">
+        <div class="modal-content glass">
+            <div class="modal-header">
+                <h3 id="modal-title">Title</h3>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div id="modal-body" class="modal-body">
+                <!-- Content injected by JS -->
+            </div>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>
