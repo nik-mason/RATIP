@@ -29,10 +29,13 @@ class _MainMapScreenState extends State<MainMapScreen> {
   static final List<js.JsObject> _searchMarkers = [];
   static js.JsObject? _activeInfoWindow;
   Map<String, dynamic>? _selectedPlaceDetails;
+  
+  static _MainMapScreenState? _activeState;
 
   @override
   void initState() {
     super.initState();
+    _activeState = this;
     _registerMapViewFactory();
     // Delay permission check slightly to ensure UI is ready
     Future.delayed(const Duration(milliseconds: 500), () {
@@ -464,6 +467,64 @@ class _MainMapScreenState extends State<MainMapScreen> {
               [container, options],
             );
             debugPrint('[Ratip] ✅ Kakao Map 렌더링 성공!');
+
+            // Add map click listener for POI-like behavior
+            final kakaoEvent = js.context['kakao']['maps']['event'];
+            kakaoEvent.callMethod('addListener', [
+              _mapInstance,
+              'click',
+              js.allowInterop((mouseEvent) {
+                if (_activeState == null) return;
+                
+                final latLng = mouseEvent['latLng'];
+                final lat = latLng.callMethod('getLat');
+                final lng = latLng.callMethod('getLng');
+                
+                // Clear existing markers and details
+                for (final marker in _searchMarkers) {
+                  marker.callMethod('setMap', [null]);
+                }
+                _searchMarkers.clear();
+                if (_activeInfoWindow != null) {
+                  _activeInfoWindow!.callMethod('close');
+                }
+                _activeState!.setState(() {
+                  _activeState!._selectedPlaceDetails = null;
+                });
+                
+                // Reverse geocoding
+                final geocoder = js.JsObject(js.context['kakao']['maps']['services']['Geocoder'] as js.JsFunction);
+                geocoder.callMethod('coord2Address', [lng, lat, js.allowInterop((result, status) {
+                  if (status == 'OK') {
+                    final list = result as List<dynamic>;
+                    if (list.isNotEmpty) {
+                      final item = list[0] as js.JsObject;
+                      final roadAddress = item['road_address'];
+                      final address = item['address'];
+                      
+                      String placeName = '선택된 위치';
+                      String addrName = '';
+                      
+                      if (roadAddress != null) {
+                        final jsRoadAddress = roadAddress as js.JsObject;
+                        final buildingName = jsRoadAddress['building_name'];
+                        if (buildingName != null && buildingName.toString().trim().isNotEmpty) {
+                          placeName = buildingName.toString();
+                        }
+                        addrName = jsRoadAddress['address_name']?.toString() ?? '';
+                      } else if (address != null) {
+                        final jsAddress = address as js.JsObject;
+                        addrName = jsAddress['address_name']?.toString() ?? '';
+                      }
+                      
+                      _activeState!._addSearchResultMarker(lat as double, lng as double, placeName, addrName, isOpen: true);
+                      _activeState!._moveToLocation(lat, lng);
+                    }
+                  }
+                })]);
+              })
+            ]);
+
           } catch (e) {
             debugPrint('[Ratip] ❌ Map 생성 에러: $e');
             _showError(container, '지도 생성에 실패했습니다.\n카카오 플랫폼 도메인 설정을 확인해주세요.');
