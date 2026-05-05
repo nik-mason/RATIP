@@ -28,6 +28,7 @@ class _MainMapScreenState extends State<MainMapScreen> {
 
   static final List<js.JsObject> _searchMarkers = [];
   static js.JsObject? _activeInfoWindow;
+  Map<String, dynamic>? _selectedPlaceDetails;
 
   @override
   void initState() {
@@ -239,15 +240,43 @@ class _MainMapScreenState extends State<MainMapScreen> {
       final marker = js.JsObject(kakaoMaps['Marker'] as js.JsFunction, [markerOptions]);
       _searchMarkers.add(marker);
 
-      final iwContent = '''
-        <div style="padding:15px; font-family: 'Inter', sans-serif; text-align: center; min-width: 150px;">
-          <div style="font-weight: bold; font-size: 15px; margin-bottom: 4px; color: #333;">$placeName</div>
-          <div style="font-size: 12px; color: #666;">$address</div>
-        </div>
-      ''';
+      final contentWrapper = html.DivElement()
+        ..style.padding = '15px'
+        ..style.fontFamily = "'Inter', sans-serif"
+        ..style.textAlign = 'center'
+        ..style.minWidth = '150px'
+        ..style.cursor = 'pointer';
+
+      final titleDiv = html.DivElement()
+        ..style.fontWeight = 'bold'
+        ..style.fontSize = '15px'
+        ..style.marginBottom = '4px'
+        ..style.color = '#333'
+        ..text = placeName;
+
+      final addrDiv = html.DivElement()
+        ..style.fontSize = '12px'
+        ..style.color = '#666'
+        ..text = address;
+
+      contentWrapper.append(titleDiv);
+      contentWrapper.append(addrDiv);
+
+      contentWrapper.onClick.listen((_) {
+        if (mounted) {
+          setState(() {
+            _selectedPlaceDetails = {
+              'place_name': placeName,
+              'road_address_name': address,
+              'lat': lat,
+              'lng': lng,
+            };
+          });
+        }
+      });
 
       final iwOptions = js.JsObject.jsify({
-        'content': iwContent,
+        'content': contentWrapper,
         'removable': true,
       });
       final infowindow = js.JsObject(kakaoMaps['InfoWindow'] as js.JsFunction, [iwOptions]);
@@ -501,12 +530,20 @@ class _MainMapScreenState extends State<MainMapScreen> {
             child: _buildSearchBar(),
           ),
 
-          // ── 3) Left sidebar nav icons
-          Positioned(
-            left: 16,
-            top: topPadding + 80,
-            child: _buildSideNav(),
-          ),
+          // ── 3) Left sidebar nav icons or Left detail panel
+          if (_selectedPlaceDetails == null)
+            Positioned(
+              left: 16,
+              top: topPadding + 80,
+              child: _buildSideNav(),
+            )
+          else
+            Positioned(
+              left: 16,
+              top: topPadding + 80,
+              bottom: 100, // Leave space for map controls
+              child: _buildLeftDetailPanel(),
+            ),
 
           // ── 4) Right-side controls (zoom, my location)
           Positioned(
@@ -615,8 +652,8 @@ class _MainMapScreenState extends State<MainMapScreen> {
               },
               child: Text(
                 'Ratip 에서 검색',
-                style: TextStyle(
-                  color: const Color(0xFF5F6368),
+                style: const TextStyle(
+                  color: Color(0xFF5F6368),
                   fontSize: 16,
                   fontWeight: FontWeight.w400,
                   letterSpacing: 0.2,
@@ -631,6 +668,130 @@ class _MainMapScreenState extends State<MainMapScreen> {
               radius: 18,
               backgroundColor: AppTheme.primaryColor,
               child: const Icon(Icons.person, color: Colors.white, size: 20),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Left detail panel when a place is selected
+  Widget _buildLeftDetailPanel() {
+    if (_selectedPlaceDetails == null) return const SizedBox.shrink();
+    
+    final placeName = _selectedPlaceDetails!['place_name'] as String;
+    final address = _selectedPlaceDetails!['road_address_name'] as String;
+
+    return Container(
+      width: 320,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.12),
+            blurRadius: 16,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Header image placeholder
+          Container(
+            height: 140,
+            decoration: const BoxDecoration(
+              color: Color(0xFFF1F3F4),
+              borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+              image: DecorationImage(
+                image: NetworkImage('https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=400&q=80'), // Placeholder
+                fit: BoxFit.cover,
+              ),
+            ),
+            alignment: Alignment.topRight,
+            padding: const EdgeInsets.all(8),
+            child: Material(
+              color: Colors.white.withOpacity(0.8),
+              shape: const CircleBorder(),
+              child: IconButton(
+                icon: const Icon(Icons.close, size: 20, color: Color(0xFF3C4043)),
+                onPressed: () {
+                  setState(() {
+                    _selectedPlaceDetails = null;
+                  });
+                },
+                constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                padding: EdgeInsets.zero,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  placeName,
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF3C4043),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Icon(Icons.location_on, size: 16, color: Color(0xFF5F6368)),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        address,
+                        style: const TextStyle(
+                          fontSize: 14,
+                          color: Color(0xFF5F6368),
+                          height: 1.3,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 24),
+                Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppTheme.primaryColor,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          elevation: 0,
+                        ),
+                        onPressed: () {},
+                        icon: const Icon(Icons.directions, size: 18),
+                        label: const Text('길찾기', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: const Color(0xFF3C4043),
+                          side: const BorderSide(color: Color(0xFFE8EAED)),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        onPressed: () {},
+                        icon: const Icon(Icons.bookmark_border, size: 18),
+                        label: const Text('저장', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
             ),
           ),
         ],
