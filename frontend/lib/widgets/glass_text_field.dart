@@ -8,6 +8,7 @@ class GlassTextField extends StatelessWidget {
   final bool isPassword;
   final TextEditingController? controller;
   final Widget? suffixIcon;
+  final Function(String)? onSubmitted;
 
   const GlassTextField({
     super.key,
@@ -17,6 +18,7 @@ class GlassTextField extends StatelessWidget {
     this.isPassword = false,
     this.controller,
     this.suffixIcon,
+    this.onSubmitted,
   });
 
   @override
@@ -42,6 +44,7 @@ class GlassTextField extends StatelessWidget {
           child: TextField(
             controller: controller,
             obscureText: isPassword,
+            onSubmitted: onSubmitted,
             decoration: InputDecoration(
               icon: Icon(icon, color: Theme.of(context).colorScheme.outline, size: 20),
               hintText: hintText,
