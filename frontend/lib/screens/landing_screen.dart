@@ -106,6 +106,59 @@ class _LandingScreenState extends State<LandingScreen> with TickerProviderStateM
     );
   }
 
+  final List<Map<String, dynamic>> _allAchievements = [
+    {'id': 1, 'title': '라팁과의 첫 만남', 'desc': '앱 설치 후 첫 로그인 성공', 'reward': '5G'},
+    {'id': 2, 'title': '동네 산책', 'desc': '누적 이동 거리 300m 달성', 'reward': '5G'},
+    {'id': 3, 'title': '지도 쳐다보기', 'desc': '지도 화면 10초 이상 유지', 'reward': '5G'},
+    {'id': 4, 'title': '영토 확장', 'desc': '새로운 시/도 첫 방문 및 기록', 'reward': '20G'},
+    {'id': 5, 'title': '전국 일주', 'desc': '대한민국 모든 시/도(17개) 방문', 'reward': '1,000G', 'special': true},
+    {'id': 6, 'title': '나침반(동)', 'desc': '대한민국 동쪽 끝단 지역 방문', 'reward': '1,500G', 'special': true},
+    {'id': 7, 'title': '나침반(서)', 'desc': '대한민국 서쪽 끝단 지역 방문', 'reward': '1,500G', 'special': true},
+    {'id': 8, 'title': '나침반(남)', 'desc': '대한민국 남쪽 끝단 지역 방문', 'reward': '1,500G', 'special': true},
+    {'id': 9, 'title': '나침반(북)', 'desc': '대한민국 북쪽 끝단 지역 방문', 'reward': '1,500G', 'special': true},
+    {'id': 10, 'title': '지구 한 바퀴', 'desc': '누적 이동 거리 40,000km 달성', 'reward': '5,000G', 'special': true},
+    {'id': 11, 'title': '산악인', 'desc': '고도 100m 이상의 고지대에서 기록', 'reward': '30G'},
+    {'id': 12, 'title': '바다의 아들', 'desc': '해변 또는 해안가에서 기록', 'reward': '100G'},
+    {'id': 13, 'title': '미식가 1', 'desc': '식당 카테고리 리뷰 1개 작성', 'reward': '5G'},
+    {'id': 14, 'title': '미식가 2', 'desc': '식당 카테고리 리뷰 5개 작성', 'reward': '30G'},
+    {'id': 15, 'title': '미식가 3', 'desc': '식당 카테고리 리뷰 10개 작성', 'reward': '100G'},
+    {'id': 16, 'title': '카페인 중독 1', 'desc': '카페 카테고리 리뷰 1개 작성', 'reward': '5G'},
+    {'id': 17, 'title': '카페인 중독 2', 'desc': '카페 카테고리 리뷰 5개 작성', 'reward': '100G'},
+    {'id': 18, 'title': '심야의 식객', 'desc': '밤 11시 이후 식당 리뷰 작성', 'reward': '10G'},
+    {'id': 19, 'title': '조식의 제왕', 'desc': '오전 7시 이전 식당 리뷰 작성', 'reward': '40G'},
+    {'id': 20, 'title': '고독한 미식가', 'desc': '\'나만 보기\'로 식당 리뷰 5개 작성', 'reward': '80G'},
+    {'id': 21, 'title': '열차의 낭만', 'desc': '기차역에서 위치 기록 및 리뷰', 'reward': '15G'},
+    {'id': 22, 'title': '날개를 펴고', 'desc': '공항에서 위치 기록 및 리뷰', 'reward': '30G'},
+    {'id': 23, 'title': '휴게소 매니아', 'desc': '고속도로 휴게소 2곳 기록', 'reward': '25G'},
+    {'id': 24, 'title': '뚜벅이의 승리', 'desc': '오직 도보로만 1km 누적 이동', 'reward': '50G'},
+    {'id': 25, 'title': '지식의 전당', 'desc': '도서관 또는 서점에서 기록', 'reward': '20G'},
+    {'id': 26, 'title': '예술혼', 'desc': '미술관 또는 박물관에서 기록', 'reward': '20G'},
+    {'id': 27, 'title': '운동 매니아', 'desc': '헬스장 또는 체육관에서 기록', 'reward': '20G'},
+    {'id': 28, 'title': '동심의 세계', 'desc': '놀이공원 또는 동물원에서 기록', 'reward': '30G'},
+    {'id': 29, 'title': '쇼핑 중독', 'desc': '백화점 또는 대형마트에서 기록', 'reward': '20G'},
+    {'id': 30, 'title': '전통의 맛', 'desc': '전통시장에서 기록', 'reward': '20G'},
+    {'id': 31, 'title': '첫 발자국', 'desc': '앱 설치 후 첫 번째 위치 기록', 'reward': '5G'},
+    {'id': 32, 'title': '기록의 습관', 'desc': '3일 연속으로 위치 기록 성공', 'reward': '20G'},
+    {'id': 33, 'title': '라팁과 한 달', 'desc': '10일 연속으로 위치 기록 성공', 'reward': '100G'},
+    {'id': 34, 'title': '라팁의 고인물', 'desc': '100일 연속으로 위치 기록 성공', 'reward': '2,000G', 'special': true},
+    {'id': 35, 'title': '사진 작가 1', 'desc': '사진이 포함된 리뷰 10개 작성', 'reward': '100G'},
+    {'id': 36, 'title': '사진 작가 2', 'desc': '사진이 포함된 리뷰 30개 작성', 'reward': '500G'},
+    {'id': 37, 'title': '정성 가득', 'desc': '300자 이상의 정성 리뷰 5개 작성', 'reward': '150G'},
+    {'id': 38, 'title': '밤의 여왕', 'desc': '밤 10시 이후 기록 5개 달성', 'reward': '30G'},
+    {'id': 39, 'title': '일요일의 산책', 'desc': '일요일에만 누적 3번 기록', 'reward': '20G'},
+    {'id': 40, 'title': '비 오는 날의 추억', 'desc': '비 오는 날 리뷰 2개 작성', 'reward': '30G'},
+    {'id': 41, 'title': '눈 오는 날의 낭만', 'desc': '눈 오는 날 리뷰 2개 작성', 'reward': '30G'},
+    {'id': 42, 'title': '대중교통 매니아', 'desc': '버스 터미널 2곳 기록', 'reward': '25G'},
+    {'id': 43, 'title': '빵순이/빵돌이', 'desc': '베이커리/빵집 5곳 기록', 'reward': '40G'},
+    {'id': 44, 'title': '술 한 잔의 여유', 'desc': '주점/술집 3곳 기록', 'reward': '30G'},
+    {'id': 45, 'title': '영화 광', 'desc': '영화관 2곳 기록', 'reward': '30G'},
+    {'id': 46, 'title': '역사의 숨결', 'desc': '유적지/문화재 2곳 기록', 'reward': '40G'},
+    {'id': 47, 'title': '호텔 스테이', 'desc': '호텔/숙박시설 2곳 기록', 'reward': '50G'},
+    {'id': 48, 'title': '공원 한 바퀴', 'desc': '공원 3곳 기록', 'reward': '30G'},
+    {'id': 49, 'title': '우정의 증표', 'desc': '공개 설정 리뷰 5개 작성', 'reward': '50G'},
+    {'id': 50, 'title': '라팁 마스터', 'desc': '누적 전체 리뷰 200개 달성', 'reward': '3,000G', 'special': true},
+  ];
+
   void _showAchievementsPopup() {
     showModalBottomSheet(
       context: context,
@@ -123,23 +176,34 @@ class _LandingScreenState extends State<LandingScreen> with TickerProviderStateM
             children: [
               Center(child: Container(width: 40, height: 4, decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(2)))),
               const SizedBox(height: 24),
-              const Text('🏅 라팁 업적 리스트 (50개)', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('🏅 라팁 업적 리스트 (50개)', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(color: Colors.white10, borderRadius: BorderRadius.circular(20)),
+                    child: const Text('ALL CLEAR 보상: Grand Master', style: TextStyle(color: Colors.orange, fontSize: 10, fontWeight: FontWeight.bold)),
+                  ),
+                ],
+              ),
               const SizedBox(height: 8),
               const Text('모든 이동과 기록이 당신의 커리어가 됩니다.', style: TextStyle(color: Colors.white54)),
               const SizedBox(height: 20),
               Expanded(
-                child: ListView(
+                child: ListView.builder(
                   controller: scrollController,
-                  children: [
-                    _buildAchievementTile('라팁과의 첫 만남', '첫 로그인 성공', '5G'),
-                    _buildAchievementTile('전국 일주', '17개 시/도 방문', '1,000G', isSpecial: true),
-                    _buildAchievementTile('나침반(동/서/남/북)', '대한민국 끝단 방문', '1,500G/각', isSpecial: true),
-                    _buildAchievementTile('지구 한 바퀴', '누적 40,000km 달성', '5,000G', isSpecial: true),
-                    _buildAchievementTile('라팁의 고인물', '100일 연속 기록', '2,000G', isSpecial: true),
-                    _buildAchievementTile('조식의 제왕', '오전 7시 이전 식당 기록', '40G'),
-                    _buildAchievementTile('고독한 미식가', '나만 보기 리뷰 5개', '80G'),
-                    _buildAchievementTile('라팁 마스터', '누적 리뷰 200개 달성', '3,000G', isSpecial: true),
-                  ],
+                  itemCount: _allAchievements.length,
+                  itemBuilder: (context, index) {
+                    final ach = _allAchievements[index];
+                    return _buildAchievementTile(
+                      ach['title'] as String,
+                      ach['desc'] as String,
+                      ach['reward'] as String,
+                      isSpecial: ach['special'] == true,
+                      id: ach['id'] as int,
+                    );
+                  },
                 ),
               ),
             ],
@@ -149,7 +213,7 @@ class _LandingScreenState extends State<LandingScreen> with TickerProviderStateM
     );
   }
 
-  Widget _buildAchievementTile(String title, String condition, String reward, {bool isSpecial = false}) {
+  Widget _buildAchievementTile(String title, String condition, String reward, {bool isSpecial = false, int id = 0}) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
@@ -160,7 +224,13 @@ class _LandingScreenState extends State<LandingScreen> with TickerProviderStateM
       ),
       child: Row(
         children: [
-          Icon(isSpecial ? Icons.auto_awesome : Icons.check_circle_outline, color: isSpecial ? Colors.orange : Colors.white70, size: 24),
+          Container(
+            width: 32,
+            height: 32,
+            alignment: Alignment.center,
+            decoration: BoxDecoration(color: isSpecial ? Colors.orange : Colors.white10, shape: BoxShape.circle),
+            child: Text('$id', style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+          ),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
