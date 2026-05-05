@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+
+<html class="light" lang="ko"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        @font-face {
+            font-family: 'Cafe24 Surround Air';
+            src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2105_2@1.0/Cafe24SsurroundAir.woff') format('woff');
+            font-weight: normal;
+            font-style: normal;
+        }
+        body {
+            font-family: 'Cafe24 Surround Air', 'Plus Jakarta Sans', sans-serif;
+            scroll-behavior: smooth;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .ambient-glow {
+            filter: blur(120px);
+            opacity: 0.4;
+            z-index: -1;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "surface-container-lowest": "#ffffff",
+                        "on-surface-variant": "#464554",
+                        "on-secondary-container": "#684000",
+                        "primary-fixed": "#e1e0ff",
+                        "on-error": "#ffffff",
+                        "background": "#f8f9ff",
+                        "error": "#ba1a1a",
+                        "outline-variant": "#c6c5d7",
+                        "surface": "#f8f9ff",
+                        "tertiary-container": "#00628d",
+                        "tertiary": "#00496b",
+                        "surface-tint": "#484bd6",
+                        "inverse-primary": "#c0c1ff",
+                        "on-tertiary-fixed": "#001e2f",
+                        "on-primary-fixed-variant": "#2e2ebe",
+                        "on-primary-container": "#d1d1ff",
+                        "surface-bright": "#f8f9ff",
+                        "on-secondary-fixed-variant": "#653e00",
+                        "on-primary-fixed": "#06006c",
+                        "secondary-container": "#fea619",
+                        "on-tertiary-container": "#abdaff",
+                        "on-secondary": "#ffffff",
+                        "surface-container-low": "#eff4ff",
+                        "on-error-container": "#93000a",
+                        "tertiary-fixed-dim": "#89cefe",
+                        "surface-dim": "#cbdbf5",
+                        "on-secondary-fixed": "#2a1700",
+                        "on-tertiary-fixed-variant": "#004c6e",
+                        "surface-container-highest": "#d3e4fe",
+                        "inverse-on-surface": "#eaf1ff",
+                        "primary": "#2c2abc",
+                        "tertiary-fixed": "#c9e6ff",
+                        "secondary-fixed": "#ffddb8",
+                        "outline": "#767586",
+                        "on-tertiary": "#ffffff",
+                        "on-background": "#0b1c30",
+                        "secondary": "#855300",
+                        "inverse-surface": "#213145",
+                        "on-surface": "#0b1c30",
+                        "surface-container-high": "#dce9ff",
+                        "secondary-fixed-dim": "#ffb95f",
+                        "primary-fixed-dim": "#c0c1ff",
+                        "primary-container": "#4648d4",
+                        "error-container": "#ffdad6",
+                        "surface-variant": "#d3e4fe",
+                        "on-primary": "#ffffff",
+                        "surface-container": "#e5eeff"
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                    spacing: {
+                        "stack-sm": "12px",
+                        "page-margin": "32px",
+                        "unit": "8px",
+                        "stack-lg": "48px",
+                        "section-padding": "96px",
+                        "container-max": "1440px",
+                        "stack-md": "24px",
+                        "gutter": "24px"
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background selection:bg-primary-fixed selection:text-on-primary-fixed">
+<!-- TopAppBar -->
+<header class="fixed top-0 w-full z-50 bg-white/60 backdrop-blur-[20px] border-b border-white/40">
+<div class="max-w-[1440px] mx-auto px-8 h-20 flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-indigo-700 text-3xl" data-weight="fill">explore</span>
+<h1 class="text-2xl font-black text-indigo-700 tracking-tighter">Ratip</h1>
+</div>
+<nav class="hidden md:flex items-center gap-12">
+<a class="text-indigo-600 font-bold border-b-2 border-indigo-600 font-['Plus_Jakarta_Sans'] text-sm tracking-tight transition-all" href="#">진실한 기록</a>
+<a class="text-slate-600 font-medium font-['Plus_Jakarta_Sans'] text-sm tracking-tight hover:text-indigo-500 hover:opacity-80 transition-all" href="#">나만의 기준</a>
+<a class="text-slate-600 font-medium font-['Plus_Jakarta_Sans'] text-sm tracking-tight hover:text-indigo-500 hover:opacity-80 transition-all" href="#">성장의 재미</a>
+<a class="text-slate-600 font-medium font-['Plus_Jakarta_Sans'] text-sm tracking-tight hover:text-indigo-500 hover:opacity-80 transition-all" href="#">기술 스택</a>
+</nav>
+<button class="bg-primary text-on-primary px-6 py-2.5 rounded-full font-bold text-sm hover:shadow-[0_0_20px_rgba(44,42,188,0.3)] active:scale-95 transition-all">
+                시작하기
+            </button>
+</div>
+</header>
+<main class="relative pt-20 overflow-hidden">
+<!-- Ambient Background Glows -->
+<div class="absolute top-0 right-0 w-[600px] h-[600px] bg-primary ambient-glow -mr-40 -mt-40"></div>
+<div class="absolute top-1/2 left-0 w-[500px] h-[500px] bg-secondary ambient-glow -ml-40"></div>
+<!-- Hero Section -->
+<section class="max-w-[1440px] mx-auto px-page-margin py-section-padding flex flex-col md:flex-row items-center justify-between min-h-[795px]">
+<div class="w-full md:w-1/2 flex flex-col gap-stack-md z-10">
+<div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/40 border border-white/60 w-fit backdrop-blur-sm">
+<span class="flex h-2 w-2 rounded-full bg-primary animate-pulse"></span>
+<span class="text-label-caps text-on-surface-variant">PREMIUM LOCATION DISCOVERY</span>
+</div>
+<h2 class="text-[60px] leading-[1.1] font-extrabold tracking-tighter text-on-background">
+                    나만의 지도를 그리는<br/>
+<span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-500">진실한 여정</span>
+</h2>
+<p class="text-xl text-on-surface-variant leading-relaxed max-w-lg">
+                    Ratip은 개인화된 위치 기록과 게이미피케이션이 결합된 혁신적인 플랫폼입니다. 당신의 모든 발걸음을 가치 있는 기록으로 전환하세요.
+                </p>
+<div class="flex gap-4 pt-4">
+<button class="px-8 py-4 bg-primary text-on-primary rounded-full font-bold text-lg hover:shadow-lg active:scale-95 transition-all flex items-center gap-2">
+                        앱 다운로드 <span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<button class="px-8 py-4 bg-white border border-outline-variant text-on-surface-variant rounded-full font-bold text-lg hover:bg-slate-50 active:scale-95 transition-all">
+                        더 알아보기
+                    </button>
+</div>
+</div>
+<div class="w-full md:w-1/2 relative mt-16 md:mt-0 flex justify-center items-center">
+<!-- 3D Crystal Compass simulation -->
+<div class="absolute -top-10 -right-10 w-40 h-40 glass-card rounded-full flex items-center justify-center animate-bounce duration-[3000ms]">
+<span class="material-symbols-outlined text-6xl text-indigo-500">explore</span>
+</div>
+<!-- Mockup Image -->
+<div class="relative w-[300px] md:w-[340px] aspect-[9/19] rounded-[3rem] border-[8px] border-slate-900 bg-slate-900 overflow-hidden shadow-2xl">
+<img class="w-full h-full object-cover opacity-90" data-alt="A premium high-fidelity iPhone mockup displaying a sophisticated map interface with glowing indigo route lines and crystalline location markers. The app UI is clean, featuring glassmorphic overlays and elegant typography. The overall setting is high-key and professional, matching a minimalist white and indigo brand aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCG2uaq4aV2AJ_6GUuFH0B8N7pLgal99IMYMv5_WXjnlePMXgguoaAnw5fPttGg2FX3oLof0Z6GwFIh32eGC053XUQK5Y8qNKhCnDxZhLt6YiFGco2h-j2yAta65brBi_MI9AJWLurRBvyZd8SIQsC7-HJIKcnqHsbtPSxJ0eFk3QeimD7ogZXezTcha1WA2vXC8sBOGapdtR-SwxuINnyAKNzZ4ciYFEO7BZes8BSsvaIgoyPJawgn2wJ0OriTLWe_KmreLClg9cvL"/>
+</div>
+</div>
+</section>
+<!-- Bento Grid Storytelling Section -->
+<section class="max-w-[1440px] mx-auto px-page-margin py-section-padding">
+<div class="text-center mb-16">
+<h3 class="text-headline-md text-on-background mb-4">어디서나 경험할 수 없는 Ratip만의 가치</h3>
+<p class="text-on-surface-variant text-body-md max-w-2xl mx-auto">우리는 단순한 기록을 넘어, 당신의 삶이 하나의 지도가 되는 과정을 함께합니다.</p>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-12 gap-gutter">
+<!-- Truthful Record -->
+<div class="md:col-span-7 glass-card rounded-lg p-10 flex flex-col justify-between overflow-hidden relative group">
+<div class="z-10">
+<div class="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-primary">verified_user</span>
+</div>
+<h4 class="text-3xl font-bold mb-4">진실한 기록</h4>
+<p class="text-on-surface-variant text-lg leading-relaxed max-w-sm">
+                            50m 반경 내 실제 위치 인증 시스템을 통해 허위 기록 없는 투명한 위치 데이터를 수집합니다. 당신의 기록은 증명된 진실입니다.
+                        </p>
+</div>
+<div class="mt-8 flex justify-end">
+<div class="w-64 h-40 bg-gradient-to-br from-indigo-500/20 to-transparent rounded-tl-3xl border-t border-l border-white/60 p-4 transform translate-x-10 translate-y-10 group-hover:translate-x-4 group-hover:translate-y-4 transition-transform duration-500">
+<div class="flex items-center gap-2 mb-2">
+<span class="text-xs font-bold text-indigo-600">인증 완료</span>
+<div class="h-px flex-1 bg-indigo-200"></div>
+</div>
+<div class="text-sm text-slate-500">내 현재 위치: 강남구 역삼동</div>
+</div>
+</div>
+</div>
+<!-- My Own Standards -->
+<div class="md:col-span-5 glass-card rounded-lg p-10 flex flex-col justify-center text-center bg-indigo-600 text-white">
+<div class="mb-6">
+<span class="material-symbols-outlined text-6xl" data-weight="fill">lock</span>
+</div>
+<h4 class="text-3xl font-bold mb-4">나만의 기준</h4>
+<p class="text-indigo-100 text-lg">
+                        Privacy by Default.<br/>모든 기록은 '나만 보기'가 기본입니다. 타인의 시선에서 벗어나 오직 나만을 위한 지도를 그려보세요.
+                    </p>
+</div>
+<!-- Joy of Growth -->
+<div class="md:col-span-5 glass-card rounded-lg p-10 flex flex-col items-center text-center overflow-hidden relative">
+<div class="w-20 h-20 bg-secondary-container/20 rounded-full flex items-center justify-center mb-6">
+<span class="material-symbols-outlined text-4xl text-secondary">trending_up</span>
+</div>
+<h4 class="text-3xl font-bold mb-4">성장의 재미</h4>
+<p class="text-on-surface-variant text-lg">
+                        30단계의 RPG 랭크와 50개 이상의 독특한 업적이 당신의 탐험을 기다립니다. 매일 더 높게 성장하세요.
+                    </p>
+<div class="flex gap-2 mt-8">
+<div class="w-12 h-12 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center"><span class="material-symbols-outlined text-slate-400">military_tech</span></div>
+<div class="w-12 h-12 rounded-full bg-indigo-100 border-2 border-primary flex items-center justify-center"><span class="material-symbols-outlined text-primary">emoji_events</span></div>
+<div class="w-12 h-12 rounded-full bg-slate-200 border-2 border-white flex items-center justify-center"><span class="material-symbols-outlined text-slate-400">star</span></div>
+</div>
+</div>
+<!-- Continuous Festival -->
+<div class="md:col-span-7 glass-card rounded-lg p-10 flex flex-col md:flex-row items-center gap-10">
+<div class="flex-1">
+<h4 class="text-3xl font-bold mb-4">축제의 연속</h4>
+<p class="text-on-surface-variant text-lg">
+                            매월 1일과 15일, Ratip만의 특별한 이벤트가 열립니다. 한정판 아이콘과 특별 배지를 획득할 기회를 놓치지 마세요.
+                        </p>
+</div>
+<div class="w-full md:w-1/3 aspect-square bg-gradient-to-tr from-orange-400 to-rose-400 rounded-2xl flex flex-col items-center justify-center text-white shadow-xl rotate-3">
+<span class="text-4xl font-black">15</span>
+<span class="text-sm font-bold opacity-80">NEXT EVENT</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Tech Stack Section -->
+<section class="bg-surface-container-low py-section-padding">
+<div class="max-w-[1440px] mx-auto px-page-margin">
+<div class="text-center mb-16">
+<span class="text-primary font-bold tracking-widest text-label-caps block mb-4 uppercase">Reliable Technology</span>
+<h3 class="text-headline-md text-on-background">압도적인 기술력의 집약</h3>
+</div>
+<div class="grid grid-cols-2 md:grid-cols-4 gap-gutter">
+<div class="glass-card p-8 rounded-lg flex flex-col items-center text-center gap-4 hover:border-primary/40 transition-colors">
+<div class="w-16 h-16 rounded-full bg-white flex items-center justify-center shadow-sm">
+<img class="w-10 h-10 object-contain rounded-md" data-alt="The Flutter framework logo, represented as a crisp blue origami bird. The background is a clean, minimalist studio shot with soft focus, embodying a high-end tech aesthetic for a professional landing page." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBCbtwHXpwglJxBRay8Wk8KmkjwniOCTO_-AHt1kxDe6ObgHNjKzURdWtx82ORV0z3g-3fkjf0Agik-3xxK5wGietle4um-sUXd172xrkLpOhQHbEe4QslH-XiG4xOzYHjiCCpMsFCaf6YRoYXGFONjDt5fQAv5f2uX71lUjDLood1DHsKR7YhtOvIHqR9NB7gA3BAtBciHI0XTGoLRfPQZJC-r5m_kHRkpkOQfzJ4HH69BDyLU1LUMuvo3eL_VqxDKLvkrNzG9KzqZ"/>
+</div>
+<h5 class="font-bold text-xl">Flutter</h5>
+<p class="text-xs text-on-surface-variant">부드러운 하이브리드 UX</p>
+</div>
+<div class="glass-card p-8 rounded-lg flex flex-col items-center text-center gap-4 hover:border-primary/40 transition-colors">
+<div class="w-16 h-16 rounded-full bg-white flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-4xl text-emerald-500">database</span>
+</div>
+<h5 class="font-bold text-xl">Supabase</h5>
+<p class="text-xs text-on-surface-variant">Face ID 기반 철저한 보안</p>
+</div>
+<div class="glass-card p-8 rounded-lg flex flex-col items-center text-center gap-4 hover:border-primary/40 transition-colors">
+<div class="w-16 h-16 rounded-full bg-white flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-4xl text-blue-500">map</span>
+</div>
+<h5 class="font-bold text-xl">Naver Map SDK</h5>
+<p class="text-xs text-on-surface-variant">국내 최적화된 지도 엔진</p>
+</div>
+<div class="glass-card p-8 rounded-lg flex flex-col items-center text-center gap-4 hover:border-primary/40 transition-colors">
+<div class="w-16 h-16 rounded-full bg-white flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-4xl text-indigo-500">fingerprint</span>
+</div>
+<h5 class="font-bold text-xl">Biometrics</h5>
+<p class="text-xs text-on-surface-variant">가장 개인적인 생체 인증</p>
+</div>
+</div>
+</div>
+</section>
+<!-- CTA Section -->
+<section class="max-w-[1440px] mx-auto px-page-margin py-section-padding">
+<div class="relative overflow-hidden bg-primary-container rounded-xl p-16 md:p-24 text-center text-white">
+<div class="absolute top-0 left-0 w-full h-full opacity-10">
+<img class="w-full h-full object-cover" data-alt="A vast, cinematic mountain landscape shrouded in morning mist, viewed from above. The scene suggests a journey of discovery and the scale of the world. The image is overlaid with a deep indigo gradient that integrates seamlessly with the UI's primary color theme." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDz5HU05MTghlSKLXCjqAdg1OwgWQuCWOSVkWycRvxesuKo4jITscCgzbP-KOen7YVJlyePFUGVzf1HMfykQFGnIxfBfSa0_HVPyEUSaTOueFSM21qIFGKBCxP3zmkEyEc07eCYfCJ4nPg4IiPP5CNxFQPLp9w3hPDQxF8QBb_yGVnzcvl2e59hZ0pgAC4H630Dvu-477zhIvc2XUBv0swv9HnsHyH_gZpI1tVEPa_9OG152LPPHsMzOuYLv3I2028AXUWAPimoZkyW"/>
+</div>
+<div class="relative z-10 flex flex-col items-center gap-8">
+<h2 class="text-display-lg font-extrabold max-w-4xl">지금 당신만의 지도를 그려보세요</h2>
+<p class="text-xl text-indigo-100 max-w-2xl leading-relaxed">
+                        Ratip은 단순한 앱이 아닙니다. 당신의 모든 여정을 가치 있는 하나의 작품으로 만들어줄 파트너입니다. 지금 바로 여정을 시작하세요.
+                    </p>
+<div class="flex flex-col sm:flex-row gap-4 mt-8">
+<button class="bg-white text-primary px-10 py-5 rounded-full font-bold text-xl hover:shadow-2xl transition-all">
+                            App Store에서 시작하기
+                        </button>
+<button class="bg-indigo-700/50 backdrop-blur-md text-white border border-white/20 px-10 py-5 rounded-full font-bold text-xl hover:bg-indigo-700 transition-all">
+                            Google Play에서 시작하기
+                        </button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="w-full py-16 bg-slate-50/50 backdrop-blur-md border-t border-slate-200">
+<div class="max-w-[1440px] mx-auto px-12 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+<div class="flex flex-col gap-4">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-indigo-700 text-2xl" data-weight="fill">explore</span>
+<span class="text-xl font-bold text-slate-900">Ratip</span>
+</div>
+<p class="text-slate-500 font-['Plus_Jakarta_Sans'] text-xs leading-relaxed">© 2024 Ratip. 모든 권리 보유.</p>
+</div>
+<div class="flex flex-wrap gap-8 md:justify-end">
+<a class="text-slate-500 font-medium font-['Plus_Jakarta_Sans'] text-xs hover:text-indigo-600 underline underline-offset-4 transition-all duration-300" href="#">지도</a>
+<a class="text-slate-500 font-medium font-['Plus_Jakarta_Sans'] text-xs hover:text-indigo-600 underline underline-offset-4 transition-all duration-300" href="#">업적</a>
+<a class="text-slate-500 font-medium font-['Plus_Jakarta_Sans'] text-xs hover:text-indigo-600 underline underline-offset-4 transition-all duration-300" href="#">이벤트</a>
+<a class="text-slate-500 font-medium font-['Plus_Jakarta_Sans'] text-xs hover:text-indigo-600 underline underline-offset-4 transition-all duration-300" href="#">개인정보 처리방침</a>
+</div>
+</div>
+</footer>
+</body></html>
