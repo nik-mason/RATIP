@@ -236,83 +236,30 @@ class _MainMapScreenState extends State<MainMapScreen> {
       final kakaoMaps = js.context['kakao']['maps'];
       final latLng = js.JsObject(kakaoMaps['LatLng'] as js.JsFunction, [lat, lng]);
 
-      // 1. Create Custom Marker
-      final markerEl = html.DivElement()..className = 'ratip-marker';
+      // 1. Create Enhanced Custom Marker (Icon + Name)
+      final markerContainer = html.DivElement()..className = 'ratip-marker-container';
+      
+      final markerIcon = html.DivElement()..className = 'ratip-marker-icon';
+      // If it's a specific category, we could change the icon color/content here
+      
+      final markerLabel = html.DivElement()
+        ..className = 'ratip-marker-label'
+        ..text = placeName;
+
+      markerContainer.append(markerIcon);
+      markerContainer.append(markerLabel);
+
       final markerOverlayOptions = js.JsObject.jsify({
         'position': latLng,
-        'content': markerEl,
-        'yAnchor': 0.5,
+        'content': markerContainer,
+        'yAnchor': 0.8,
       });
       final markerOverlay = js.JsObject(kakaoMaps['CustomOverlay'] as js.JsFunction, [markerOverlayOptions]);
       markerOverlay.callMethod('setMap', [_mapInstance]);
       _searchMarkers.add(markerOverlay);
 
-      // 2. Create Custom Popup (InfoWindow)
-      final popupContainer = html.DivElement()..className = 'ratip-popup-container';
-      final popupEl = html.DivElement()..className = 'ratip-popup';
-      
-      final contentWrapper = html.DivElement()
-        ..style.fontFamily = "'Inter', sans-serif"
-        ..style.textAlign = 'center'
-        ..style.cursor = 'pointer';
-
-      final titleDiv = html.DivElement()
-        ..style.fontWeight = 'bold'
-        ..style.fontSize = '15px'
-        ..style.marginBottom = '4px'
-        ..style.color = '#333'
-        ..text = placeName;
-
-      final addrDiv = html.DivElement()
-        ..style.fontSize = '12px'
-        ..style.color = '#666'
-        ..text = address;
-
-      contentWrapper.append(titleDiv);
-      contentWrapper.append(addrDiv);
-      
-      if (category != null && category.isNotEmpty) {
-        final catDiv = html.DivElement()
-          ..style.fontSize = '11px'
-          ..style.color = '#4285F4'
-          ..style.marginTop = '4px'
-          ..text = category;
-        contentWrapper.append(catDiv);
-      }
-
-      // Close button for popup
-      final closeBtn = html.DivElement()
-        ..style.position = 'absolute'
-        ..style.top = '8px'
-        ..style.right = '8px'
-        ..style.fontSize = '14px'
-        ..style.color = '#999'
-        ..style.cursor = 'pointer'
-        ..style.padding = '4px'
-        ..innerHtml = '&times;';
-
-      popupEl.append(closeBtn);
-      popupEl.append(contentWrapper);
-      popupContainer.append(popupEl);
-
-      final popupOverlayOptions = js.JsObject.jsify({
-        'position': latLng,
-        'content': popupContainer,
-        'zIndex': 1000,
-      });
-      final popupOverlay = js.JsObject(kakaoMaps['CustomOverlay'] as js.JsFunction, [popupOverlayOptions]);
-
-      // Interaction: Marker Click -> Show Popup
-      markerEl.onClick.listen((_) {
-        if (_activeInfoWindow != null) {
-          _activeInfoWindow!.callMethod('setMap', [null]);
-        }
-        popupOverlay.callMethod('setMap', [_mapInstance]);
-        _activeInfoWindow = popupOverlay;
-      });
-
-      // Interaction: Popup Content Click -> Show Left Panel
-      contentWrapper.onClick.listen((_) {
+      // 2. Interaction: Marker Click -> Directly Show Left Panel
+      markerContainer.onClick.listen((_) {
         if (mounted) {
           setState(() {
             _selectedPlaceDetails = {
@@ -325,25 +272,12 @@ class _MainMapScreenState extends State<MainMapScreen> {
               'placeUrl': placeUrl ?? '',
             };
           });
+          _moveToLocation(lat, lng);
         }
       });
 
-      // Interaction: Close Button Click
-      closeBtn.onClick.listen((e) {
-        e.stopPropagation();
-        popupOverlay.callMethod('setMap', [null]);
-        if (_activeInfoWindow == popupOverlay) {
-          _activeInfoWindow = null;
-        }
-      });
-
-      // User's specific request: "Only show when marker is clicked"
-      // So even if isOpen is true (from search result), we don't open it immediately.
-      // But for better UX during search, maybe we can keep it? 
-      // The user said: "각 마크를 눌러야만 팝업이 나오게" (Make it so the popup ONLY comes out when pressing each mark).
-      // So I will IGNORE the isOpen flag here.
     } catch (e) {
-      debugPrint('[Ratip] Add custom marker error: $e');
+      debugPrint('[Ratip] Add enhanced marker error: $e');
     }
   }
 
@@ -506,51 +440,56 @@ class _MainMapScreenState extends State<MainMapScreen> {
             );
             debugPrint('[Ratip] ✅ Kakao Map 렌더링 성공!');
 
-            // Inject Custom Styles for Animations and Markers
+            // Inject Custom Styles for Animated Enhanced Markers
             final style = html.StyleElement()
               ..text = '''
-                @keyframes ratipPopupFadeIn {
-                  from { opacity: 0; transform: translateY(10px) scale(0.9); }
-                  to { opacity: 1; transform: translateY(0) scale(1); }
-                }
-                .ratip-marker {
-                  width: 20px;
-                  height: 20px;
-                  background-color: #4285F4;
-                  border: 3px solid white;
-                  border-radius: 50%;
-                  box-shadow: 0 4px 10px rgba(0,0,0,0.25);
+                .ratip-marker-container {
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
                   cursor: pointer;
                   transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                  pointer-events: auto;
                 }
-                .ratip-marker:hover {
-                  transform: scale(1.4);
-                  z-index: 999;
+                .ratip-marker-container:hover {
+                  transform: scale(1.25);
+                  z-index: 1000;
                 }
-                .ratip-popup-container {
+                .ratip-marker-icon {
+                  width: 22px;
+                  height: 22px;
+                  background-color: #6c757d;
+                  border: 3px solid white;
+                  border-radius: 50%;
+                  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
                   position: relative;
-                  bottom: 45px;
-                  left: 0;
-                  transform: translateX(-50%);
                 }
-                .ratip-popup {
-                  background: white;
-                  border-radius: 18px;
-                  box-shadow: 0 10px 40px rgba(0,0,0,0.18);
-                  padding: 16px;
-                  min-width: 180px;
-                  animation: ratipPopupFadeIn 0.35s cubic-bezier(0.23, 1, 0.32, 1);
-                  transform-origin: bottom center;
-                }
-                .ratip-popup::after {
+                .ratip-marker-icon::after {
                   content: '';
                   position: absolute;
-                  bottom: -8px;
+                  top: 50%;
                   left: 50%;
-                  transform: translateX(-50%);
-                  border-left: 8px solid transparent;
-                  border-right: 8px solid transparent;
-                  border-top: 8px solid white;
+                  transform: translate(-50%, -50%);
+                  width: 6px;
+                  height: 6px;
+                  background-color: white;
+                  border-radius: 1px;
+                }
+                .ratip-marker-label {
+                  margin-top: 4px;
+                  background-color: white;
+                  padding: 3px 8px;
+                  border-radius: 6px;
+                  font-size: 13px;
+                  font-weight: 600;
+                  color: #333;
+                  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+                  white-space: nowrap;
+                  border: 1px solid rgba(0,0,0,0.05);
+                }
+                .ratip-marker-container:hover .ratip-marker-label {
+                  background-color: #4285F4;
+                  color: white;
                 }
               ''';
             html.document.head!.append(style);
