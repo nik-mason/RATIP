@@ -231,7 +231,7 @@ class _MainMapScreenState extends State<MainMapScreen> {
     }
   }
 
-  void _addSearchResultMarker(double lat, double lng, String placeName, String address, {bool isOpen = false, String? phone, String? category, String? placeUrl}) {
+  void _addSearchResultMarker(double lat, double lng, String placeName, String address, {bool isOpen = false, String? phone, String? category, String? placeUrl, String? photoUrl}) {
     if (_mapInstance == null) return;
     try {
       final kakaoMaps = js.context['kakao']['maps'];
@@ -247,10 +247,12 @@ class _MainMapScreenState extends State<MainMapScreen> {
       markerContainer.append(markerIcon);
       markerContainer.append(markerLabel);
 
+      // yAnchor: 1.0 means the bottom of the overlay aligns with the lat/lng coordinate
+      // This fixes the "selection appears above actual click" bug
       final markerOverlayOptions = js.JsObject.jsify({
         'position': latLng,
         'content': markerContainer,
-        'yAnchor': 0.8,
+        'yAnchor': 1.0,
       });
       final markerOverlay = js.JsObject(kakaoMaps['CustomOverlay'] as js.JsFunction, [markerOverlayOptions]);
       markerOverlay.callMethod('setMap', [_mapInstance]);
@@ -308,10 +310,9 @@ class _MainMapScreenState extends State<MainMapScreen> {
               'phone': phone ?? '',
               'category': category ?? '',
               'placeUrl': placeUrl ?? '',
+              'photoUrl': photoUrl ?? '',
             };
           });
-          // Only move if needed, but user said "stop moving" earlier.
-          // Let's keep it still for now as per previous fix.
         }
       });
 
@@ -336,6 +337,7 @@ class _MainMapScreenState extends State<MainMapScreen> {
               'phone': phone ?? '',
               'category': category ?? '',
               'placeUrl': placeUrl ?? '',
+              'photoUrl': photoUrl ?? '',
             };
           });
         }
@@ -517,6 +519,10 @@ class _MainMapScreenState extends State<MainMapScreen> {
                   flex-direction: column;
                   align-items: center;
                   cursor: pointer;
+                  /* transform-origin: bottom center so the marker scales
+                     downward from its anchor point (the map coordinate),
+                     preventing the visual "jump upward" on hover */
+                  transform-origin: center bottom;
                   transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
                   pointer-events: auto;
                 }
@@ -670,8 +676,13 @@ class _MainMapScreenState extends State<MainMapScreen> {
                                      final phone = place['phone']?.toString() ?? '';
                                      final category = place['category_group_name']?.toString() ?? '';
                                      final placeUrl = place['place_url']?.toString() ?? '';
+                                     final placeId = place['id']?.toString() ?? '';
+                                     // Build Kakao place photo URL using the place ID
+                                     final photoUrl = placeId.isNotEmpty
+                                         ? 'https://place.map.kakao.com/main/v/$placeId'
+                                         : '';
                                      
-                                     _activeState!._addSearchResultMarker(lat as double, lng as double, realName, addrName, isOpen: true, phone: phone, category: category, placeUrl: placeUrl);
+                                     _activeState!._addSearchResultMarker(lat as double, lng as double, realName, addrName, isOpen: true, phone: phone, category: category, placeUrl: placeUrl, photoUrl: photoUrl);
                                      
                                      // Directly show side panel
                                      _activeState!.setState(() {
@@ -683,6 +694,7 @@ class _MainMapScreenState extends State<MainMapScreen> {
                                          'phone': phone,
                                          'category': category,
                                          'placeUrl': placeUrl,
+                                         'photoUrl': photoUrl,
                                        };
                                      });
                                      return;
@@ -877,12 +889,37 @@ class _MainMapScreenState extends State<MainMapScreen> {
                         final addr = p['road_address_name']?.toString().isNotEmpty == true 
                                      ? p['road_address_name'].toString() 
                                      : (p['address_name']?.toString() ?? '');
-                        _addSearchResultMarker(lat, lng, name, addr, isOpen: p == selectedPlace);
+                        final pid = p['id']?.toString() ?? '';
+                        final pPhoto = pid.isNotEmpty ? 'https://place.map.kakao.com/main/v/$pid' : '';
+                        _addSearchResultMarker(
+                          lat, lng, name, addr,
+                          isOpen: p == selectedPlace,
+                          phone: p['phone']?.toString(),
+                          category: p['category_group_name']?.toString(),
+                          placeUrl: p['place_url']?.toString(),
+                          photoUrl: pPhoto,
+                        );
                       }
 
-                      // move to selected place
+                      // move to selected place & show its detail panel
                       final selectedLat = double.parse(selectedPlace['y'].toString());
                       final selectedLng = double.parse(selectedPlace['x'].toString());
+                      final selId = selectedPlace['id']?.toString() ?? '';
+                      final selPhoto = selId.isNotEmpty ? 'https://place.map.kakao.com/main/v/$selId' : '';
+                      setState(() {
+                        _selectedPlaceDetails = {
+                          'place_name': selectedPlace['place_name']?.toString() ?? '',
+                          'road_address_name': selectedPlace['road_address_name']?.toString().isNotEmpty == true
+                              ? selectedPlace['road_address_name'].toString()
+                              : (selectedPlace['address_name']?.toString() ?? ''),
+                          'lat': selectedLat,
+                          'lng': selectedLng,
+                          'phone': selectedPlace['phone']?.toString() ?? '',
+                          'category': selectedPlace['category_group_name']?.toString() ?? '',
+                          'placeUrl': selectedPlace['place_url']?.toString() ?? '',
+                          'photoUrl': selPhoto,
+                        };
+                      });
                       _moveToLocation(selectedLat, selectedLng);
                       _showSearchPulse(selectedLat, selectedLng); // Trigger pulse effect
                       
@@ -958,16 +995,30 @@ class _MainMapScreenState extends State<MainMapScreen> {
     final category = _selectedPlaceDetails!['category'] as String? ?? '';
     final phone = _selectedPlaceDetails!['phone'] as String? ?? '';
     final placeUrl = _selectedPlaceDetails!['placeUrl'] as String? ?? '';
+    // Real Kakao place photo URL (set when a place was found via Places API)
+    final photoUrl = _selectedPlaceDetails!['photoUrl'] as String? ?? '';
 
-    String getImgKeyword() {
-      final name = placeName.toLowerCase();
+    // Build real image URL: use Kakao place photo page thumbnail,
+    // or fall back to a curated Unsplash query based on the place category.
+    String buildImageUrl() {
+      if (photoUrl.isNotEmpty) {
+        // Kakao place photo (og:image scraped via proxy is not possible in web;
+        // instead use the dedicated photo endpoint)
+        return photoUrl;
+      }
+      // Fallback: Unsplash category photo (free, no auth needed)
       final cat = category.toLowerCase();
-      if (cat.contains('카페') || name.contains('카페')) return 'cafe';
-      if (cat.contains('음식점') || cat.contains('식당')) return 'restaurant';
-      return 'city,building';
+      String query = 'landmark,korea';
+      if (cat.contains('카페')) query = 'cafe,coffee';
+      else if (cat.contains('음식점') || cat.contains('식당')) query = 'restaurant,food,korea';
+      else if (cat.contains('숙박')) query = 'hotel,accommodation';
+      else if (cat.contains('편의점') || cat.contains('마트')) query = 'convenience store,supermarket';
+      else if (cat.contains('병원') || cat.contains('의원')) query = 'hospital,clinic';
+      else if (cat.contains('은행')) query = 'bank,finance';
+      return 'https://source.unsplash.com/400x300/?$query&sig=${placeName.hashCode}';
     }
 
-    final imageUrl = 'https://loremflickr.com/400/300/${getImgKeyword()}?lock=${placeName.hashCode}';
+    final imageUrl = buildImageUrl();
 
     return Container(
       width: isMobile ? double.infinity : 380,
@@ -990,16 +1041,36 @@ class _MainMapScreenState extends State<MainMapScreen> {
         children: [
           Stack(
             children: [
-              Container(
-                height: isMobile ? 180 : 240,
-                decoration: BoxDecoration(
-                  borderRadius: isMobile 
+              // Place photo with error fallback
+              ClipRRect(
+                borderRadius: isMobile
                     ? const BorderRadius.vertical(top: Radius.circular(24))
                     : const BorderRadius.only(topRight: Radius.circular(24)),
-                  image: DecorationImage(
-                    image: NetworkImage(imageUrl),
-                    fit: BoxFit.cover,
-                  ),
+                child: Image.network(
+                  imageUrl,
+                  height: isMobile ? 180 : 240,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  errorBuilder: (_, __, ___) {
+                    // Secondary fallback: Unsplash with different query
+                    final cat = category.toLowerCase();
+                    String q = 'korea,street';
+                    if (cat.contains('카페')) q = 'cafe';
+                    else if (cat.contains('음식')) q = 'food,korea';
+                    final fallback = 'https://source.unsplash.com/400x300/?$q&sig=${placeName.hashCode + 1}';
+                    return Image.network(
+                      fallback,
+                      height: isMobile ? 180 : 240,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => Container(
+                        height: isMobile ? 180 : 240,
+                        color: const Color(0xFFF0F0F5),
+                        child: const Icon(Icons.image_not_supported_outlined,
+                            size: 48, color: Color(0xFFBBBBCC)),
+                      ),
+                    );
+                  },
                 ),
               ),
               Positioned(

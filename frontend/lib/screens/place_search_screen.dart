@@ -67,6 +67,10 @@ class _PlaceSearchScreenState extends State<PlaceSearchScreen> {
                   'road_address_name': jsItem['road_address_name'],
                   'x': jsItem['x'],
                   'y': jsItem['y'],
+                  'id': jsItem['id'],
+                  'phone': jsItem['phone'],
+                  'category_group_name': jsItem['category_group_name'],
+                  'place_url': jsItem['place_url'],
                 };
               }).toList();
               _isLoading = false;
